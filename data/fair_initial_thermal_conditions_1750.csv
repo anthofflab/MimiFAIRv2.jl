@@ -1,0 +1,9 @@
+File Description: Initial conditions in the year 1750 for the FAIR v2.0 simple climate model.,,,,
+"Code Source: Calculated using default Python model version under RCMIP historical emissions from https://github.com/njleach/
+FAIR/tree/47c6eec031d2edcf09424394dbb86581a1b246ba",,,,
+"Paper Reference: Leach et al. 2021. ""FaIRv2.0.0: a generalized impulse response model for climate
+uncertainty and future scenario exploration,"" Geoscientific Model Development. https://doi.org/10.5194/gmd-14-3007-2021",,,,
+"Note: These values represent the period 1 model values produced by FAIR when run under the historic RCMIP emissions and forcing scenario. Here, period 1 corresponds to the year 1750. ""thermal_box_x"" terms refer to response of jth thermal box in 1750.",,,,
+,,,,
+Year,global_temp_anomaly,thermal_box_1,thermal_box_2,thermal_box_3
+1750,0.020574170520757500000,0.031626764773538900000,0.009236725147551680000,0.000284851120424314000

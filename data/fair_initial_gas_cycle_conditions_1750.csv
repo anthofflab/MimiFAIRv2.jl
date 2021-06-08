@@ -1,0 +1,60 @@
+File Description: Initial conditions in the year 1750 for the FAIR v2.0 simple climate model.,,,,,,,
+"Code Source: Calculated using default Python model version under RCMIP historical emissions from https://github.com/njleach/
+FAIR/tree/47c6eec031d2edcf09424394dbb86581a1b246ba",,,,,,,
+"Paper Reference: Leach et al. 2021. ""FaIRv2.0.0: a generalized impulse response model for climate
+uncertainty and future scenario exploration,"" Geoscientific Model Development. https://doi.org/10.5194/gmd-14-3007-2021",,,,,,,
+"Note: These values represent the period 1 model values produced by FAIR when run under the historic RCMIP emissions and forcing scenario. Here, period 1 corresponds to the year 1750. ""pool-x"" terms refer to concentrations in each of the four gas revervoirs.",,,,,,,
+,,,,,,,
+gas_name,gas_group,concentration,cumulative_uptake,pool1,pool2,pool3,pool4
+c2f6,flourinated,1.00E-15,0,0,0,0,0
+c3f8,flourinated,1.00E-15,0,0,0,0,0
+c4f10,flourinated,1.00E-15,0,0,0,0,0
+c5f12,flourinated,1.00E-15,0,0,0,0,0
+c6f14,flourinated,1.00E-15,0,0,0,0,0
+c7f16,flourinated,1.00E-15,0,0,0,0,0
+c8f18,flourinated,1.00E-15,0,0,0,0,0
+c_c4f8,flourinated,1.00E-15,0,0,0,0,0
+carbon_dioxide,primary,278.0170031,0.08370013,0.018188038,0.018629579,0.022079669,0.013627782
+carbon_tetrachloride,montreal,2.54E-05,2.49E-05,2.45E-05,0.00E+00,0.00E+00,0.00E+00
+cf4,flourinated,0.034050322,1.01E-05,1.01E-05,0.00E+00,0.00E+00,0.00E+00
+cfc113,montreal,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+cfc114,montreal,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+cfc115,montreal,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+cfc11,montreal,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+cfc12,montreal,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+ch2cl2,montreal,0.006912761,0,0,0.00E+00,0.00E+00,0.00E+00
+ch3ccl3,montreal,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+chcl3,montreal,0.006,0,0,0.00E+00,0.00E+00,0.00E+00
+halon1211,montreal,4.57E-06,7.72E-06,7.49E-06,0.00E+00,0.00E+00,0.00E+00
+halon1301,montreal,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+halon2402,montreal,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+hcfc141b,montreal,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+hcfc142b,montreal,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+hcfc22,montreal,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+hfc125,flourinated,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+hfc134a,flourinated,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+hfc143a,flourinated,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+hfc152a,flourinated,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+hfc227ea,flourinated,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+hfc236fa,flourinated,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+hfc23,flourinated,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+hfc245fa,flourinated,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+hfc32,flourinated,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+hfc365mfc,flourinated,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+hfc4310mee,flourinated,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+methane,primary,723.1495657,19.01978312,17.91227128,0.00E+00,0.00E+00,0.00E+00
+methyl_bromide,montreal,0.005299998,0,0,0.00E+00,0.00E+00,0.00E+00
+methyl_chloride,montreal,0.457,0,0,0.00E+00,0.00E+00,0.00E+00
+nf3,flourinated,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+nitrous_oxide,primary,270.0054728,0.054741468,0.054468547,0.00E+00,0.00E+00,0.00E+00
+sf6,flourinated,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+so2f2,flourinated,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+halon1202,montreal,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+so2,aerosol_plus,170.6,0,0,0.00E+00,0.00E+00,0.00E+00
+nox,aerosol_plus,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+nox_avi,aerosol_plus,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+co,aerosol_plus,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+nmvoc,aerosol_plus,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+bc,aerosol_plus,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+nh3,aerosol_plus,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00
+oc,aerosol_plus,1.00E-15,0,0,0.00E+00,0.00E+00,0.00E+00

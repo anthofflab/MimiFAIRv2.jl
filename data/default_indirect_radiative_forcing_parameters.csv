@@ -1,0 +1,37 @@
+File Description: Default indirect forcing parameters for the FAIR v2.0 simple climate model.,,,,,
+"Code Source: Extracted from https://github.com/njleach/
+FAIR/tree/47c6eec031d2edcf09424394dbb86581a1b246ba",,,,,
+"Paper Reference: Leach et al. 2021. ""FaIRv2.0.0: a generalized impulse response model for climate
+uncertainty and future scenario exploration,"" Geoscientific Model Development. https://doi.org/10.5194/gmd-14-3007-2021",,,,,
+"Note:  From original FAIR Python code, ""'Indirect' forcings can be specified by adding species with the syntax 'x|y': this means the gas cycle of species 'x' is used to compute an additional forcing based on the f parameters specified. 'y' designates the name of the indirect forcing, such as 'methane|strat_h2o'.""",,,,,
+,,,,,
+gas_name,indirect_forcing_effect,gas_group,f1,f2,f3
+methane,methane|o3,primary,0,0.000163,0
+co,co|o3,aerosol_plus,0,0.000145,0
+nox,nox|o3,aerosol_plus,0,0.00168,0
+nmvoc,nmvoc|o3,aerosol_plus,0,0.000308,0
+nitrous_oxide,nitrous_oxide|o3,primary,0,0.000663,0
+carbon_tetrachloride,carbon_tetrachloride|o3,montreal,0,-0.254957108,0
+cfc113,cfc113|o3,montreal,0,-0.102438124,0
+cfc114,cfc114|o3,montreal,0,-0.029593236,0
+cfc115,cfc115|o3,montreal,0,-0.00796741,0
+cfc11,cfc11|o3,montreal,0,-0.160486394,0
+cfc12,cfc12|o3,montreal,0,-0.054633666,0
+ch3ccl3,ch3ccl3|o3,montreal,0,-0.208290851,0
+halon1211,halon1211|o3,montreal,0,-3.32923902,0
+halon1301,halon1301|o3,montreal,0,-1.639009979,0
+halon2402,halon2402|o3,montreal,0,-6.760916163,0
+hcfc141b,hcfc141b|o3,montreal,0,-0.077397693,0
+hcfc142b,hcfc142b|o3,montreal,0,-0.019349423,0
+hcfc22,hcfc22|o3,montreal,0,-0.017073021,0
+methyl_bromide,methyl_bromide|o3,montreal,0,-3.073143711,0
+methyl_chloride,methyl_chloride|o3,montreal,0,-0.05008086,0
+halon1202,halon1202|o3,montreal,0,-6.863354287,0
+chcl3,chcl3|o3,montreal,0,0,0
+ch2cl2,ch2cl2|o3,montreal,0,0,0
+methane,methane|strat_h2o,primary,0,0.0000437,0
+bc,bc|bc_on_snow,aerosol_plus,0,0.0116,0
+nox_avi,nox_avi|contrails,aerosol_plus,0,0.0164,0
+so2,so2|aci,aerosol_plus,-0.955789,0,0
+bc,bc|aci,aerosol_plus,0,-0.008013,0
+oc|aci,oc|aci,aerosol_plus,0,-0.008013,0
