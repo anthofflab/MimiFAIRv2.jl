@@ -4,31 +4,31 @@
 
 @defcomp flourinated_cycles begin
 
-    flourinated_gases  = Index()                                            # Index for flourinated gases controlled under the Kyoto Protocol.
+    flourinated_gases  = Index()    # Index for flourinated gases controlled under the Kyoto Protocol.
 
-    flourinated_0    		= Parameter(index=[flourinated_gases]) # flourinated gas concentration in initial model period (ppb).
-    flourinated_pi   		= Parameter(index=[flourinated_gases])              # Pre-industrial flourinated gas concentrations (ppb).
-    g0_flourinated   		= Parameter(index=[flourinated_gases]) # Constant to set approximation of value for α equal to Millar et al. (2017) numerical solution for iIRF100 flourinated gas cycle parameterization at α=1.
-    g1_flourinated   		= Parameter(index=[flourinated_gases]) # Constant to set approximation of gradient for α equal to Millar et al. (2017) numerical solution for iIRF100 flourinated gas cycle parameterization at α=1.
-    emiss2conc_flourinated  = Parameter(index=[flourinated_gases])              # Conversion factor between emissions and concentrations.
-    GU_flourinated_0        = Parameter(index=[flourinated_gases]) # Initial model period value for cumulative uptake of agent (unit of E⁻¹).
-    r0_flourinated   		= Parameter(index=[flourinated_gases])              # Strength of pre-industrial uptake from atmosphere.
-    rA_flourinated   		= Parameter(index=[flourinated_gases]) # Sensitivity of uptake from atmosphere to current atmospheric burden of agent (unit of E⁻¹).
-    rT_flourinated   		= Parameter(index=[flourinated_gases]) # Sensitivity of uptake from atmosphere to model temperature change since initialization (K⁻¹).
-    rU_flourinated   		= Parameter(index=[flourinated_gases]) # Sensitivity of uptake from atmosphere to cumulative uptake of agent since model initialization (unit of E⁻¹).
-    τ_flourinated    		= Parameter(index=[flourinated_gases, 4])     # Atmospheric lifetime of gas in iᵗʰ reservior (years).
-    a_flourinated    		= Parameter(index=[flourinated_gases, 4])     # Fraction of emissions entering iᵗʰ flourinated gas reservior.
-    R0_flourinated    		= Parameter(index=[flourinated_gases, 4]) # Initial model period value for quantity of agent in iᵗʰ atmospheric reservior (unit of E).
-    E_flourinated    		= Parameter(index=[time, flourinated_gases])  # Annual flourinated gas emissions (Tg yr⁻¹).
-    Tj       		    = Parameter(index=[time, 3])  # Temperature change for three thermal pools (K).
+    flourinated_0    		= Parameter(index=[flourinated_gases])  # flourinated gas concentration in initial model period (ppb).
+    flourinated_pi   		= Parameter(index=[flourinated_gases])  # Pre-industrial flourinated gas concentrations (ppb).
+    g0_flourinated   		= Parameter(index=[flourinated_gases])  # Constant to set approximation of value for α equal to Millar et al. (2017) numerical solution for iIRF100 flourinated gas cycle parameterization at α=1.
+    g1_flourinated   		= Parameter(index=[flourinated_gases])  # Constant to set approximation of gradient for α equal to Millar et al. (2017) numerical solution for iIRF100 flourinated gas cycle parameterization at α=1.
+    emiss2conc_flourinated  = Parameter(index=[flourinated_gases])  # Conversion factor between emissions and concentrations.
+    GU_flourinated_0        = Parameter(index=[flourinated_gases])  # Initial model period value for cumulative uptake of agent (unit of E⁻¹).
+    r0_flourinated   		= Parameter(index=[flourinated_gases])  # Strength of pre-industrial uptake from atmosphere.
+    rA_flourinated   		= Parameter(index=[flourinated_gases])  # Sensitivity of uptake from atmosphere to current atmospheric burden of agent (unit of E⁻¹).
+    rT_flourinated   		= Parameter(index=[flourinated_gases])  # Sensitivity of uptake from atmosphere to model temperature change since initialization (K⁻¹).
+    rU_flourinated   		= Parameter(index=[flourinated_gases])  # Sensitivity of uptake from atmosphere to cumulative uptake of agent since model initialization (unit of E⁻¹).
+    τ_flourinated    		= Parameter(index=[flourinated_gases, 4])   # Atmospheric lifetime of gas in iᵗʰ reservior (years).
+    a_flourinated    		= Parameter(index=[flourinated_gases, 4])   # Fraction of emissions entering iᵗʰ flourinated gas reservior.
+    R0_flourinated    		= Parameter(index=[flourinated_gases, 4])   # Initial model period value for quantity of agent in iᵗʰ atmospheric reservior (unit of E).
+    E_flourinated    		= Parameter(index=[time, flourinated_gases])    # Annual flourinated gas emissions (Tg yr⁻¹).
+    Tj       		        = Parameter(index=[time, 3])    # Temperature change for three thermal pools (K).
 
-    α_flourinated           = Variable(index=[time, flourinated_gases])   # State-dependent multiplicative adjustment coefficient of reservior lifetimes.
-    flourinated_conc        = Variable(index=[time, flourinated_gases])   # Total atmospheric flourinated gas concentrations (ppb).
-    GA_flourinated          = Variable(index=[time, flourinated_gases])   # Atmospheric burden of agent above pre-industrial levels (unit of E).
-    GU_flourinated          = Variable(index=[time, flourinated_gases])   # Cumulative uptake of agent since model initialization (unit of E⁻¹).
-    iIRFT100_flourinated    = Variable(index=[time, flourinated_gases])   # 100-year integrated impulse response function (the average airborne fraction over a 100-year period).
-    decay_rate_flourinated  = Variable(index=[time, flourinated_gases, 4])
-    R_flourinated           = Variable(index=[time, flourinated_gases, 4]) # Quantity of agent in iᵗʰ atmospheric reservior (unit of E).
+    α_flourinated           = Variable(index=[time, flourinated_gases]) # State-dependent multiplicative adjustment coefficient of reservior lifetimes.
+    flourinated_conc        = Variable(index=[time, flourinated_gases]) # Total atmospheric flourinated gas concentrations (ppb).
+    GA_flourinated          = Variable(index=[time, flourinated_gases]) # Atmospheric burden of agent above pre-industrial levels (unit of E).
+    GU_flourinated          = Variable(index=[time, flourinated_gases]) # Cumulative uptake of agent since model initialization (unit of E⁻¹).
+    iIRFT100_flourinated    = Variable(index=[time, flourinated_gases]) # 100-year integrated impulse response function (the average airborne fraction over a 100-year period).
+    decay_rate_flourinated  = Variable(index=[time, flourinated_gases, 4])  # Decay rates
+    R_flourinated           = Variable(index=[time, flourinated_gases, 4])  # Quantity of agent in iᵗʰ atmospheric reservior (unit of E).
 
 
     function run_timestep(p, v, d, t)

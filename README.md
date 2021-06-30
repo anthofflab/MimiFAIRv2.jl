@@ -1,15 +1,17 @@
-# MimiFAIRv2.0.jl
+# MimiFAIRv2.jl
 
 This is a work-in-progress respository for a Julia-Mimi implementation of the FAIRv2.0 simple climate model. The model description paper can be found at [FaIRv2.0.0: A Generalized Impulse Response Model for Climate Uncertainty and Future Scenario Exploration](https://gmd.copernicus.org/articles/14/3007/2021/gmd-14-3007-2021.html). 
 
-## Running Mimi-FAIRv2.0
+## Running Mimi-FAIRv2
 To run the model, execute the following code:
 
 ```julia
-# Load the model code.
-include("src/MimiFAIRv2.0.jl")
 
-# Create an instance of Mimi-FAIRv2.0.
+# Load the model code.
+include("src/MimiFAIRv2.jl") # load the MimiFAIRv2 module
+using Main.MimiFAIRv2 # bring the module into your namespace
+
+# Create an instance of Mimi-FAIRv2.
 m = get_model() 
 
 # Run the model.
@@ -33,4 +35,4 @@ The `get_model()` function currently has the following keyword arguments:
 
 \
 \
-![Python vs. Julia temperature comparison](https://github.com/FrankErrickson/MimiFAIRv2.0.jl/blob/main/data/python_replication_data/Python_Mimi_FAIR2_temperature_comparison.png)
+![Python vs. Julia temperature comparison](https://github.com/FrankErrickson/MimiFAIRv2.jl/blob/main/data/python_replication_data/Python_Mimi_FAIR2_temperature_comparison.png)

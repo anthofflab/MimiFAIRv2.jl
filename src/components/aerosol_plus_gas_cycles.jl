@@ -4,31 +4,31 @@
 
 @defcomp aerosol_plus_cycles begin
 
-    aerosol_plus_gases  = Index()                                            # Index for tropospheric ozone precursors, aerosols and reactive gas
+    aerosol_plus_gases  = Index()   # Index for tropospheric ozone precursors, aerosols and reactive gas
 
-    aerosol_plus_0    		= Parameter(index=[aerosol_plus_gases]) # Aerosol+ gas concentration in initial model period (ppb).
-    aerosol_plus_pi   		= Parameter(index=[aerosol_plus_gases]) # Pre-industrial Aerosol+ concentrations (ppb).
-    g0_aerosol_plus   		= Parameter(index=[aerosol_plus_gases]) # Constant to set approximation of value for α equal to Millar et al. (2017) numerical solution for iIRF100 Aerosol+ gas cycle parameterization at α=1.
-    g1_aerosol_plus   		= Parameter(index=[aerosol_plus_gases]) # Constant to set approximation of gradient for α equal to Millar et al. (2017) numerical solution for iIRF100 Aerosol+ gas cycle parameterization at α=1.
-    emiss2conc_aerosol_plus = Parameter(index=[aerosol_plus_gases])              # Conversion factor between emissions and concentrations.
-    GU_aerosol_plus_0       = Parameter(index=[aerosol_plus_gases]) # Initial model period value for cumulative uptake of agent (unit of E⁻¹).
-    r0_aerosol_plus   		= Parameter(index=[aerosol_plus_gases])              # Strength of pre-industrial uptake from atmosphere.
-    rA_aerosol_plus   		= Parameter(index=[aerosol_plus_gases]) # Sensitivity of uptake from atmosphere to current atmospheric burden of agent (unit of E⁻¹).
-    rT_aerosol_plus   		= Parameter(index=[aerosol_plus_gases]) # Sensitivity of uptake from atmosphere to model temperature change since initialization (K⁻¹).
-    rU_aerosol_plus   		= Parameter(index=[aerosol_plus_gases]) # Sensitivity of uptake from atmosphere to cumulative uptake of agent since model initialization (unit of E⁻¹).
-    τ_aerosol_plus    		= Parameter(index=[aerosol_plus_gases, 4])     # Atmospheric lifetime of gas in iᵗʰ reservior (years).
-    a_aerosol_plus    		= Parameter(index=[aerosol_plus_gases, 4])     # Fraction of emissions entering iᵗʰ Aerosol+ gas reservior.
-    R0_aerosol_plus    		= Parameter(index=[aerosol_plus_gases, 4]) # Initial model period value for quantity of agent in iᵗʰ atmospheric reservior (unit of E).
+    aerosol_plus_0    		= Parameter(index=[aerosol_plus_gases])     # Aerosol+ gas concentration in initial model period (ppb).
+    aerosol_plus_pi   		= Parameter(index=[aerosol_plus_gases])     # Pre-industrial Aerosol+ concentrations (ppb).
+    g0_aerosol_plus   		= Parameter(index=[aerosol_plus_gases])     # Constant to set approximation of value for α equal to Millar et al. (2017) numerical solution for iIRF100 Aerosol+ gas cycle parameterization at α=1.
+    g1_aerosol_plus   		= Parameter(index=[aerosol_plus_gases])     # Constant to set approximation of gradient for α equal to Millar et al. (2017) numerical solution for iIRF100 Aerosol+ gas cycle parameterization at α=1.
+    emiss2conc_aerosol_plus = Parameter(index=[aerosol_plus_gases])     # Conversion factor between emissions and concentrations.
+    GU_aerosol_plus_0       = Parameter(index=[aerosol_plus_gases])     # Initial model period value for cumulative uptake of agent (unit of E⁻¹).
+    r0_aerosol_plus   		= Parameter(index=[aerosol_plus_gases])     # Strength of pre-industrial uptake from atmosphere.
+    rA_aerosol_plus   		= Parameter(index=[aerosol_plus_gases])     # Sensitivity of uptake from atmosphere to current atmospheric burden of agent (unit of E⁻¹).
+    rT_aerosol_plus   		= Parameter(index=[aerosol_plus_gases])     # Sensitivity of uptake from atmosphere to model temperature change since initialization (K⁻¹).
+    rU_aerosol_plus   		= Parameter(index=[aerosol_plus_gases])     # Sensitivity of uptake from atmosphere to cumulative uptake of agent since model initialization (unit of E⁻¹).
+    τ_aerosol_plus    		= Parameter(index=[aerosol_plus_gases, 4])  # Atmospheric lifetime of gas in iᵗʰ reservior (years).
+    a_aerosol_plus    		= Parameter(index=[aerosol_plus_gases, 4])  # Fraction of emissions entering iᵗʰ Aerosol+ gas reservior.
+    R0_aerosol_plus    		= Parameter(index=[aerosol_plus_gases, 4])  # Initial model period value for quantity of agent in iᵗʰ atmospheric reservior (unit of E).
     E_aerosol_plus    		= Parameter(index=[time, aerosol_plus_gases])  # Annual Aerosol+ emissions (Tg yr⁻¹).
-    Tj       		        = Parameter(index=[time, 3])  # Temperature change for three thermal pools (K).
+    Tj       		        = Parameter(index=[time, 3])                # Temperature change for three thermal pools (K).
 
     α_aerosol_plus           = Variable(index=[time, aerosol_plus_gases])   # State-dependent multiplicative adjustment coefficient of reservior lifetimes.
     aerosol_plus_conc        = Variable(index=[time, aerosol_plus_gases])   # Total atmospheric Aerosol+ concentrations (ppb).
     GA_aerosol_plus          = Variable(index=[time, aerosol_plus_gases])   # Atmospheric burden of agent above pre-industrial levels (unit of E).
     GU_aerosol_plus          = Variable(index=[time, aerosol_plus_gases])   # Cumulative uptake of agent since model initialization (unit of E⁻¹).
     iIRFT100_aerosol_plus    = Variable(index=[time, aerosol_plus_gases])   # 100-year integrated impulse response function (the average airborne fraction over a 100-year period).
-    decay_rate_aerosol_plus  = Variable(index=[time, aerosol_plus_gases, 4])
-    R_aerosol_plus           = Variable(index=[time, aerosol_plus_gases, 4]) # Quantity of agent in iᵗʰ atmospheric reservior (unit of E).
+    decay_rate_aerosol_plus  = Variable(index=[time, aerosol_plus_gases, 4])    # Decay rates
+    R_aerosol_plus           = Variable(index=[time, aerosol_plus_gases, 4])    # Quantity of agent in iᵗʰ atmospheric reservior (unit of E).
 
 
     function run_timestep(p, v, d, t)

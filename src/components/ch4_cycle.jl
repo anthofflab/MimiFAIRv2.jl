@@ -4,29 +4,29 @@
 
 @defcomp ch4_cycle begin
 
-    ch4_0    		= Parameter() # Methane concentration in initial model period (ppb).
-    ch4_pi   		= Parameter()              # Pre-industrial methane concentrations (ppb).
-    g0_ch4   		= Parameter() # Constant to set approximation of value for α equal to Millar et al. (2017) numerical solution for iIRF100 methane cycle parameterization at α=1.
-    g1_ch4   		= Parameter() # Constant to set approximation of gradient for α equal to Millar et al. (2017) numerical solution for iIRF100 methane cycle parameterization at α=1.
-    emiss2conc_ch4  = Parameter()              # Conversion factor between emissions and concentrations.
-    GU_ch4_0        = Parameter() # Initial model period value for cumulative uptake of agent (unit of E⁻¹).
-    r0_ch4   		= Parameter()              # Strength of pre-industrial uptake from atmosphere.
-    rA_ch4   		= Parameter() # Sensitivity of uptake from atmosphere to current atmospheric burden of agent (unit of E⁻¹).
-    rT_ch4   		= Parameter() # Sensitivity of uptake from atmosphere to model temperature change since initialization (K⁻¹).
-    rU_ch4   		= Parameter() # Sensitivity of uptake from atmosphere to cumulative uptake of agent since model initialization (unit of E⁻¹).
-    τ_ch4    		= Parameter(index=[4])     # Atmospheric lifetime of gas in iᵗʰ reservior (years).
-    a_ch4    		= Parameter(index=[4])     # Fraction of emissions entering iᵗʰ methane reservior.
-    R0_ch4    		= Parameter(index=[4]) # Initial model period value for quantity of agent in iᵗʰ atmospheric reservior (unit of E).
-    E_ch4    		= Parameter(index=[time])  # Annual methane emissions (TgCH₄ yr⁻¹).
-    Tj       		= Parameter(index=[time,3])  # Temperature change for three thermal pools (K).
+    ch4_0    		= Parameter()   # Methane concentration in initial model period (ppb).
+    ch4_pi   		= Parameter()   # Pre-industrial methane concentrations (ppb).
+    g0_ch4   		= Parameter()   # Constant to set approximation of value for α equal to Millar et al. (2017) numerical solution for iIRF100 methane cycle parameterization at α=1.
+    g1_ch4   		= Parameter()   # Constant to set approximation of gradient for α equal to Millar et al. (2017) numerical solution for iIRF100 methane cycle parameterization at α=1.
+    emiss2conc_ch4  = Parameter()   # Conversion factor between emissions and concentrations.
+    GU_ch4_0        = Parameter()   # Initial model period value for cumulative uptake of agent (unit of E⁻¹).
+    r0_ch4   		= Parameter()   # Strength of pre-industrial uptake from atmosphere.
+    rA_ch4   		= Parameter()   # Sensitivity of uptake from atmosphere to current atmospheric burden of agent (unit of E⁻¹).
+    rT_ch4   		= Parameter()   # Sensitivity of uptake from atmosphere to model temperature change since initialization (K⁻¹).
+    rU_ch4   		= Parameter()   # Sensitivity of uptake from atmosphere to cumulative uptake of agent since model initialization (unit of E⁻¹).
+    τ_ch4    		= Parameter(index=[4])  # Atmospheric lifetime of gas in iᵗʰ reservior (years).
+    a_ch4    		= Parameter(index=[4])  # Fraction of emissions entering iᵗʰ methane reservior.
+    R0_ch4    		= Parameter(index=[4])  # Initial model period value for quantity of agent in iᵗʰ atmospheric reservior (unit of E).
+    E_ch4    		= Parameter(index=[time])   # Annual methane emissions (TgCH₄ yr⁻¹).
+    Tj       		= Parameter(index=[time,3]) # Temperature change for three thermal pools (K).
 
-    α_ch4           = Variable(index=[time])   # State-dependent multiplicative adjustment coefficient of reservior lifetimes.
-    ch4             = Variable(index=[time])   # Total atmospheric methane concentrations (ppb).
-    GA_ch4          = Variable(index=[time])   # Atmospheric burden of agent above pre-industrial levels (unit of E).
-    GU_ch4          = Variable(index=[time])   # Cumulative uptake of agent since model initialization (unit of E⁻¹).
-    iIRFT100_ch4    = Variable(index=[time])   # 100-year integrated impulse response function (the average airborne fraction over a 100-year period).
-    decay_rate_ch4  = Variable(index=[time,4])
-    R_ch4           = Variable(index=[time,4]) # Quantity of agent in iᵗʰ atmospheric reservior (unit of E).
+    α_ch4           = Variable(index=[time])    # State-dependent multiplicative adjustment coefficient of reservior lifetimes.
+    ch4             = Variable(index=[time])    # Total atmospheric methane concentrations (ppb).
+    GA_ch4          = Variable(index=[time])    # Atmospheric burden of agent above pre-industrial levels (unit of E).
+    GU_ch4          = Variable(index=[time])    # Cumulative uptake of agent since model initialization (unit of E⁻¹).
+    iIRFT100_ch4    = Variable(index=[time])    # 100-year integrated impulse response function (the average airborne fraction over a 100-year period).
+    decay_rate_ch4  = Variable(index=[time,4])  # Decay rates
+    R_ch4           = Variable(index=[time,4])  # Quantity of agent in iᵗʰ atmospheric reservior (unit of E).
 
 
     function run_timestep(p, v, d, t)

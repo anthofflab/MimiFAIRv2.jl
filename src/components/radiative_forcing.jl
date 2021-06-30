@@ -4,64 +4,80 @@
 
 @defcomp radiative_forcing begin
 
-    montreal_gases  = Index()                                            # Index for Ozone Depleting Substances controlled under the Montreal Protocol.
-    aerosol_plus_gases  = Index()                                            # Index for tropospheric ozone precursors, aerosols and reactive gas
-    flourinated_gases  = Index()                                            # Index for flourinated gases controlled under the Kyoto Protocol.
+    montreal_gases  = Index()       # Index for Ozone Depleting Substances controlled under the Montreal Protocol.
+    aerosol_plus_gases  = Index()   # Index for tropospheric ozone precursors, aerosols and reactive gas
+    flourinated_gases  = Index()    # Index for flourinated gases controlled under the Kyoto Protocol.
 
-    # CO2, CH4, and N2O parametes
-    co2_conc = Parameter(index=[time])
-    ch4_conc = Parameter(index=[time])
-    n2o_conc = Parameter(index=[time])
-    co2_pi = Parameter()
-    ch4_pi = Parameter()
-    n2o_pi = Parameter()
-    co2_f    = Parameter(index=[3]) # f coefficient for
-    ch4_f    = Parameter(index=[3]) # f coefficient for
-    ch4_o3_f    = Parameter(index=[3]) # f coefficient for
-    ch4_h2o_f    = Parameter(index=[3]) # f coefficient for
-    n2o_f    = Parameter(index=[3]) # f coefficient for
-    n2o_o3_f    = Parameter(index=[3]) # f coefficient for
+    ##
+    ## Parameters
+    ##
+
+    # CO2, CH4, and N2O parameters
+    co2_conc    = Parameter(index=[time])
+    ch4_conc    = Parameter(index=[time])
+    n2o_conc    = Parameter(index=[time])
+    co2_pi      = Parameter()
+    ch4_pi      = Parameter()
+    n2o_pi      = Parameter()
+    co2_f       = Parameter(index=[3]) # f coefficient for co2
+    ch4_f       = Parameter(index=[3]) # f coefficient for ch4
+    ch4_o3_f    = Parameter(index=[3]) # f coefficient for ch4_o3
+    ch4_h2o_f   = Parameter(index=[3]) # f coefficient for ch4_h2o
+    n2o_f       = Parameter(index=[3]) # f coefficient for n2o_f
+    n2o_o3_f    = Parameter(index=[3]) # f coefficient for n2o_o3
 
     # Aerosol+ parameters
-    aerosol_plus_conc = Parameter(index=[time, aerosol_plus_gases])
-    aerosol_plus_pi = Parameter(index=[aerosol_plus_gases])
-    bc_f      = Parameter(index=[3]) # f coefficient for
-    bc_snow_f = Parameter(index=[3]) # f coefficient for
-    bc_aci_f  = Parameter(index=[3]) # f coefficient for
-    co_f    = Parameter(index=[3]) # f coefficient for
-    co_o3_f = Parameter(index=[3]) # f coefficient for
-    nh3_f               = Parameter(index=[3]) # f coefficient for
-    nmvoc_f             = Parameter(index=[3]) # f coefficient for
-    nmvoc_o3_f          = Parameter(index=[3]) # f coefficient for
-    nox_f               = Parameter(index=[3]) # f coefficient for
-    nox_o3_f            = Parameter(index=[3]) # f coefficient for
-    nox_avi_f           = Parameter(index=[3]) # f coefficient for
-    nox_avi_contrails_f = Parameter(index=[3]) # f coefficient for
-    oc_f                = Parameter(index=[3]) # f coefficient for
-    oc_aci_f            = Parameter(index=[3]) # f coefficient for
-    so2_f               = Parameter(index=[3]) # f coefficient for
-    so2_aci_f           = Parameter(index=[3]) # f coefficient for
+    aerosol_plus_conc   = Parameter(index=[time, aerosol_plus_gases])
+    aerosol_plus_pi     = Parameter(index=[aerosol_plus_gases])
+    bc_f                = Parameter(index=[3]) # f coefficient for bc
+    bc_snow_f           = Parameter(index=[3]) # f coefficient for bc_snow
+    bc_aci_f            = Parameter(index=[3]) # f coefficient for bc_aci
+    co_f                = Parameter(index=[3]) # f coefficient for co
+    co_o3_f             = Parameter(index=[3]) # f coefficient for co_o3
+    nh3_f               = Parameter(index=[3]) # f coefficient for nh3
+    nmvoc_f             = Parameter(index=[3]) # f coefficient for nmvoc
+    nmvoc_o3_f          = Parameter(index=[3]) # f coefficient for nmvoc_o3
+    nox_f               = Parameter(index=[3]) # f coefficient for nox
+    nox_o3_f            = Parameter(index=[3]) # f coefficient for nox_o3
+    nox_avi_f           = Parameter(index=[3]) # f coefficient for nox_avi
+    nox_avi_contrails_f = Parameter(index=[3]) # f coefficient for nox_avi_contrails
+    oc_f                = Parameter(index=[3]) # f coefficient for oc
+    oc_aci_f            = Parameter(index=[3]) # f coefficient for oc_aci
+    so2_f               = Parameter(index=[3]) # f coefficient for so2
+    so2_aci_f           = Parameter(index=[3]) # f coefficient for so2_aci
 
     # Montreal gas parameters
-    montreal_conc = Parameter(index=[time, montreal_gases])
-    montreal_pi = Parameter(index=[montreal_gases])
-    montreal_f = Parameter(index=[montreal_gases, 3]) # f coefficient
-    montreal_ind_f = Parameter(index=[montreal_gases, 3]) # f coefficient for indirect forcing effect on O3
+    montreal_conc   = Parameter(index=[time, montreal_gases])
+    montreal_pi     = Parameter(index=[montreal_gases])
+    montreal_f      = Parameter(index=[montreal_gases, 3]) # f coefficient
+    montreal_ind_f  = Parameter(index=[montreal_gases, 3]) # f coefficient for indirect forcing effect on O3
 
     # Flourinated gas parameters
-    flourinated_conc = Parameter(index=[time, flourinated_gases])
-    flourinated_pi = Parameter(index=[flourinated_gases])
-    flourinated_f = Parameter(index=[flourinated_gases, 3]) # f coefficient
+    flourinated_conc    = Parameter(index=[time, flourinated_gases])
+    flourinated_pi      = Parameter(index=[flourinated_gases])
+    flourinated_f       = Parameter(index=[flourinated_gases, 3]) # f coefficient
 
-    exogenous_RF = Parameter(index=[time])
+    # Other parameters
+    exogenous_RF    = Parameter(index=[time])
 
+    ##
+    ## Variables
+    ##
+
+    # CO2, CH4, and N2O variables
+    co2_RF = Variable(index=[time])
+    ch4_RF = Variable(index=[time])
+    ch4_o3_RF = Variable(index=[time])
+    ch4_h2o_RF = Variable(index=[time])
+    n2o_RF = Variable(index=[time])
+    n2o_o3_RF = Variable(index=[time])
+
+    # Aerosol+ variables
     bc_RF = Variable(index=[time])
     bc_snow_RF = Variable(index=[time])
     bc_aci_RF = Variable(index=[time])
-
     co_RF = Variable(index=[time])
     co_o3_RF = Variable(index=[time])
-
     nh3_RF = Variable(index=[time])
     nmvoc_RF = Variable(index=[time])
     nmvoc_o3_RF = Variable(index=[time])
@@ -74,20 +90,14 @@
     so2_RF = Variable(index=[time])
     so2_aci_RF = Variable(index=[time])
 
-    co2_RF = Variable(index=[time])
-
-    ch4_RF = Variable(index=[time])
-    ch4_o3_RF = Variable(index=[time])
-    ch4_h2o_RF = Variable(index=[time])
-
-    n2o_RF = Variable(index=[time])
-    n2o_o3_RF = Variable(index=[time])
-
+    # Montreal gas variables
     montreal_RF = Variable(index=[time, montreal_gases])
     montreal_ind_RF = Variable(index=[time, montreal_gases])
-
+    
+    # Flourinated gas variables
     flourinated_RF = Variable(index=[time, flourinated_gases])
 
+    # Other variables
     total_RF = Variable(index=[time])
 
     function run_timestep(p, v, d, t)
