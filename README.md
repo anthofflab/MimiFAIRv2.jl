@@ -10,7 +10,7 @@ To add the package without necessarily downloading the full repository, run the 
 pkg> add https://github.com/FrankErrickson/MimiFAIRv2.jl.git # add MimiFAIRv2 module on main branch
 ```
 
-To work locally assuming you have downloaded the full repository and want to work with that version, likely only if you want to actively develope the MimiFAIRv2 package itself, ou will later run the following command at the julia REPL, but do not need to call `add`.
+To work locally assuming you have downloaded the full repository and want to work with that version, likely only if you want to actively develope the MimiFAIRv2 package itself, you will later run the following command at the julia REPL, but do not need to call `add`.
 
 ```julia
 include("src/MimiFAIRv2.jl") # load the MimiFAIRv2 module 
