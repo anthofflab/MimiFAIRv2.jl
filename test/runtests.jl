@@ -3,7 +3,7 @@ using CSVFiles
 using Test
 
 include(joinpath(@__DIR__, "..", "src", "MimiFAIRv2.jl"))
-using Main.MimiFAIRv2
+using MimiFAIRv2: get_model # load `get_model` function to avoid need for `MimiFAIRv2.` prefix
 
 @testset "UI" begin
     

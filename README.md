@@ -2,17 +2,39 @@
 
 This is a work-in-progress respository for a Julia-Mimi implementation of the FAIRv2.0 simple climate model. The model description paper can be found at [FaIRv2.0.0: A Generalized Impulse Response Model for Climate Uncertainty and Future Scenario Exploration](https://gmd.copernicus.org/articles/14/3007/2021/gmd-14-3007-2021.html). 
 
-## Running Mimi-FAIRv2
-To run the model, execute the following code:
+## Preparing the Software Environment
+
+To add the package without necessarily downloading the full repository, run the following command at the julia package REPL:
 
 ```julia
+pkg> add https://github.com/FrankErrickson/MimiFAIRv2.jl.git # add MimiFAIRv2 module on main branch
+```
 
-# Load the model code.
-include("src/MimiFAIRv2.jl") # load the MimiFAIRv2 module
-using Main.MimiFAIRv2 # bring the module into your namespace
+To work locally assuming you have downloaded the full repository and want to work with that version, likely only if you want to actively develope the MimiFAIRv2 package itself, ou will later run the following command at the julia REPL, but do not need to call `add`.
 
-# Create an instance of Mimi-FAIRv2.
-m = get_model() 
+```julia
+include("src/MimiFAIRv2.jl") # load the MimiFAIRv2 module 
+```
+
+You probably also want to install the Mimi package into your julia environment, so that you can use some of the tools in there:
+
+```julia
+pkg> add Mimi
+```
+## Running the Model
+
+The model uses the Mimi framework and it is highly recommended to read the Mimi  documentation first to understand the code structure. The basic way to access a copy of the default MimiFAIRv2 model and explore the resuts is the following:
+
+```julia
+using Mimi 
+using MimiFAIRv2  # if you used the `pkg> add` syntax above and thus have the module in your environment
+
+# note that instead of the line above one could call the following line, which
+# may be particularly helpful for package development
+# include("src/MimiFAIRv2.jl")
+
+# Create an instance of MimiFAIRv2.
+m = MimiFAIRv2.get_model() 
 
 # Run the model.
 run(m)
