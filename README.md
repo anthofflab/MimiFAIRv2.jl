@@ -1,16 +1,14 @@
 # MimiFAIRv2.jl
 
-This is a work-in-progress respository for a Julia-Mimi implementation of the FAIRv2.0 simple climate model. The model description paper can be found at [FaIRv2.0.0: A Generalized Impulse Response Model for Climate Uncertainty and Future Scenario Exploration](https://gmd.copernicus.org/articles/14/3007/2021/gmd-14-3007-2021.html). 
+This is a work-in-progress repository for a Julia-Mimi implementation of the FAIRv2.0 simple climate model. The model description paper can be found at [FaIRv2.0.0: A Generalized Impulse Response Model for Climate Uncertainty and Future Scenario Exploration](https://gmd.copernicus.org/articles/14/3007/2021/gmd-14-3007-2021.html). 
 
 ## Preparing the Software Environment
 
-To add the package without necessarily downloading the full repository, run the following command at the julia package REPL:
+To add the package to your current environment, run the following command at the julia package REPL:
 
 ```julia
-pkg> add https://github.com/FrankErrickson/MimiFAIRv2.jl.git # add MimiFAIRv2 module on main branch
+pkg> add https://github.com/FrankErrickson/MimiFAIRv2.jl.git
 ```
-
-To work locally assuming you have downloaded the full repository and want to work with that version, likely only if you want to actively develope the MimiFAIRv2 package itself, you will later run the following command at the julia REPL, but do not need to call `add`.
 
 ```julia
 include("src/MimiFAIRv2.jl") # load the MimiFAIRv2 module 
@@ -21,17 +19,14 @@ You probably also want to install the Mimi package into your julia environment, 
 ```julia
 pkg> add Mimi
 ```
+
 ## Running the Model
 
 The model uses the Mimi framework and it is highly recommended to read the Mimi  documentation first to understand the code structure. The basic way to access a copy of the default MimiFAIRv2 model and explore the resuts is the following:
 
 ```julia
 using Mimi 
-using MimiFAIRv2  # if you used the `pkg> add` syntax above and thus have the module in your environment
-
-# note that instead of the line above one could call the following line, which
-# may be particularly helpful for package development
-# include("src/MimiFAIRv2.jl")
+using MimiFAIRv2
 
 # Create an instance of MimiFAIRv2.
 m = MimiFAIRv2.get_model() 
