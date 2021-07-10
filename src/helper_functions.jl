@@ -1,6 +1,6 @@
 # #----------------------------------------------------------------------------------------------------------------------
 # #----------------------------------------------------------------------------------------------------------------------
-# This file contains functions and other snippets of code that are used in various calculations for Mimi-FAIRv2.0.
+# This file contains functions and other snippets of code that are used in various calculations for MimiFAIRv2.
 # #----------------------------------------------------------------------------------------------------------------------
 # #----------------------------------------------------------------------------------------------------------------------
 
@@ -21,6 +21,20 @@
 #       F2x: Radiative forcing from a doubling of carbon dioxide concentrations (Wm⁻²).
 #----------------------------------------------------------------------------------------------------------------------
 
+"""
+    get_thermal_parameter_defaults(;TCR::Float64=1.79, RWF::Float64=0.552, F2x::Float64=3.759)
+
+Return a dataframe of the FAIRv2.0.0-alpha default climate parameters using the
+optional keyword arguments for transient climate response (K) (TCR; defaults to 1.79), 
+realized warming fraction in ratio of TCR/ECS (RWF; defaults to 0.552), and radiative 
+forcing from a double of carbon dioxide concentrations (Wm⁻²) (F2x; defaults to 
+3.759).
+
+The response timescales d1-3 (and the shortest-timescale coefficient, q1) are set 
+to the central estimate of a CMIP6 inferred distribution constrained with observational 
+warming. The constraint does not significantly affect the central estimates of
+the prior (ie. raw CMIP6 inference) distribution.
+"""
 function get_thermal_parameter_defaults(;TCR::Float64=1.79, RWF::Float64=0.552, F2x::Float64=3.759)
 
     # Set default values for d1, d2, d3, and q1 parameters.
@@ -63,6 +77,15 @@ end
 #----------------------------------------------------------------------------------------------------------------------
 
 # Function version for a single gas (where a and τ are vectors).
+"""
+    calculate_g0_g1(a::Array{Float64,1}, τ::Array{Float64,1})
+
+For a SINGLE gas, calculate and return constants for estimating the state-dependent 
+adjustment coefficient of a reservior's lifetime (α) such that it approximates 
+the Millar et al. (2017) numerical solution for a iIRF100 carbon cycle parameterization 
+at α=1. The two required arguments are a, the fraction of emissions entering iᵗʰ 
+atmospheric pool, and τ, the atmospheric lifetime of gas in iᵗʰ pool.
+"""
 function calculate_g0_g1(a::Array{Float64,1}, τ::Array{Float64,1})
     g1 = sum(a .* τ .* (1.0 .- (1.0 .+ 100.0 ./ τ) .* exp.(-100.0 ./ τ)))
     g0 = exp(-1.0 * sum(a .* τ .* (1.0 .- exp.(-100.0 ./ τ))) / g1)
@@ -70,6 +93,15 @@ function calculate_g0_g1(a::Array{Float64,1}, τ::Array{Float64,1})
 end
 
 # Function version for multiple gases (where a and τ are 2-d arrays).
+"""
+    calculate_g0_g1(a::Array{Float64,1}, τ::Array{Float64,1})
+
+For MULITPLE gases, calculate and return constants for estimating the state-dependent 
+adjustment coefficient of a reservior's lifetime (α) such that it approximates 
+the Millar et al. (2017) numerical solution for a iIRF100 carbon cycle parameterization 
+at α=1. The two required arguments are a, the fraction of emissions entering iᵗʰ 
+atmospheric pool, and τ, the atmospheric lifetime of gas in iᵗʰ pool.
+"""
 function calculate_g0_g1(a::Array{Float64,2}, τ::Array{Float64,2})
     g1 = vec(sum(a .* τ .* (1.0 .- (1.0 .+ 100.0 ./ τ) .* exp.(-100.0 ./ τ)), dims=2))
     g0 = vec(exp.(-1.0 .* sum(a .* τ .* (1.0 .- exp.(-100.0 ./ τ)), dims=2) ./ g1))
@@ -91,6 +123,18 @@ end
 #       C_pi: Pre-industrial concentration of forcing agent in atmosphere.
 #----------------------------------------------------------------------------------------------------------------------
 
+"""
+    calculate_RF(f, C, C_pi)
+
+Calculate and return the effective radiative forcing based on the atmospheric 
+concentration of a greenhouse gas or other forcing agent following Equation (6) 
+in Leach et al. (2021). 
+
+The required arguments are as follows:
+    f:    A vector of three concentration-forcing coefficients (1 = logarithmic, 2 = linear, 3 = square root)
+    C:    Concentration of forcing agent in atmosphere
+    C_pi: Pre-industrial concentration of forcing agent in atmosphere
+"""
 function calculate_RF(f, C, C_pi)
 
     if C <= 0.0

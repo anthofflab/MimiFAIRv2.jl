@@ -6,10 +6,10 @@
 
     #d   = Parameter(index=[3])      # Thermal response timescales: [1] Thermal equilibration of deep ocean & [2] Thermal admustment of upper ocean (years).
     decay_factor = Parameter(index=[3]) # Thermal response decay factor, calculated as exp(-1/d) where d represents thermal response timescale of jth thermal box.
-    q   = Parameter(index=[3])      # Raditive forcing coefficient: [1] Thermal equilibration of deep ocean & [2] Thermal admustment of upper ocean (K W⁻¹m²).
-    F   = Parameter(index=[time])   # Total radiative forcing (Wm⁻²).
-    Tj_0 = Parameter(index=[3])
-    T_0 = Parameter()
+    q       = Parameter(index=[3])      # Raditive forcing coefficient: [1] Thermal equilibration of deep ocean & [2] Thermal admustment of upper ocean (K W⁻¹m²).
+    F       = Parameter(index=[time])   # Total radiative forcing (Wm⁻²).
+    Tj_0    = Parameter(index=[3])
+    T_0     = Parameter()
 
     T   = Variable(index=[time])    # Global mean surface temperature anomaly (K).
     Tj  = Variable(index=[time,3])  # Temperature change for three thermal pools (K).

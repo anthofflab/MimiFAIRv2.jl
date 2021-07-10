@@ -4,29 +4,29 @@
 
 @defcomp n2o_cycle begin
 
-    n2o_0    		= Parameter() # Nitrous oxide concentration in initial model period (ppb).
-    n2o_pi   		= Parameter()              # Pre-industrial nitrous oxide concentrations (ppb).
-    g0_n2o   		= Parameter() # Constant to set approximation of value for α equal to Millar et al. (2017) numerical solution for iIRF100 nitrous oxide cycle parameterization at α=1.
-    g1_n2o   		= Parameter() # Constant to set approximation of gradient for α equal to Millar et al. (2017) numerical solution for iIRF100 nitrous oxide cycle parameterization at α=1.
-    emiss2conc_n2o  = Parameter()              # Conversion factor between emissions and concentrations.
-    GU_n2o_0        = Parameter() # Initial model period value for cumulative uptake of agent (unit of E⁻¹).
-    r0_n2o   		= Parameter()              # Strength of pre-industrial uptake from atmosphere.
-    rA_n2o   		= Parameter() # Sensitivity of uptake from atmosphere to current atmospheric burden of agent (unit of E⁻¹).
-    rT_n2o   		= Parameter() # Sensitivity of uptake from atmosphere to model temperature change since initialization (K⁻¹).
-    rU_n2o   		= Parameter() # Sensitivity of uptake from atmosphere to cumulative uptake of agent since model initialization (unit of E⁻¹).
-    τ_n2o    		= Parameter(index=[4])     # Atmospheric lifetime of gas in iᵗʰ reservior (years).
-    a_n2o    		= Parameter(index=[4])     # Fraction of emissions entering iᵗʰ nitrous oxide reservior.
-    R0_n2o    		= Parameter(index=[4]) # Initial model period value for quantity of agent in iᵗʰ atmospheric reservior (unit of E).
-    E_n2o    		= Parameter(index=[time])  # Annual nitrous oxide emissions (TgN yr⁻¹).
-    Tj       		= Parameter(index=[time,3])  # Temperature change for three thermal pools (K).
+    n2o_0    		= Parameter()   # Nitrous oxide concentration in initial model period (ppb).
+    n2o_pi   		= Parameter()   # Pre-industrial nitrous oxide concentrations (ppb).
+    g0_n2o   		= Parameter()   # Constant to set approximation of value for α equal to Millar et al. (2017) numerical solution for iIRF100 nitrous oxide cycle parameterization at α=1.
+    g1_n2o   		= Parameter()   # Constant to set approximation of gradient for α equal to Millar et al. (2017) numerical solution for iIRF100 nitrous oxide cycle parameterization at α=1.
+    emiss2conc_n2o  = Parameter()   # Conversion factor between emissions and concentrations.
+    GU_n2o_0        = Parameter()   # Initial model period value for cumulative uptake of agent (unit of E⁻¹).
+    r0_n2o   		= Parameter()   # Strength of pre-industrial uptake from atmosphere.
+    rA_n2o   		= Parameter()   # Sensitivity of uptake from atmosphere to current atmospheric burden of agent (unit of E⁻¹).
+    rT_n2o   		= Parameter()   # Sensitivity of uptake from atmosphere to model temperature change since initialization (K⁻¹).
+    rU_n2o   		= Parameter()   # Sensitivity of uptake from atmosphere to cumulative uptake of agent since model initialization (unit of E⁻¹).
+    τ_n2o    		= Parameter(index=[4])  # Atmospheric lifetime of gas in iᵗʰ reservior (years).
+    a_n2o    		= Parameter(index=[4])  # Fraction of emissions entering iᵗʰ nitrous oxide reservior.
+    R0_n2o    		= Parameter(index=[4])  # Initial model period value for quantity of agent in iᵗʰ atmospheric reservior (unit of E).
+    E_n2o    		= Parameter(index=[time])   # Annual nitrous oxide emissions (TgN yr⁻¹).
+    Tj       		= Parameter(index=[time,3]) # Temperature change for three thermal pools (K).
 
-    α_n2o           = Variable(index=[time])   # State-dependent multiplicative adjustment coefficient of reservior lifetimes.
-    n2o             = Variable(index=[time])   # Total atmospheric nitrous oxide concentrations (ppb).
-    GA_n2o          = Variable(index=[time])   # Atmospheric burden of agent above pre-industrial levels (unit of E).
-    GU_n2o          = Variable(index=[time])   # Cumulative uptake of agent since model initialization (unit of E⁻¹).
-    iIRFT100_n2o    = Variable(index=[time])   # 100-year integrated impulse response function (the average airborne fraction over a 100-year period).
-    decay_rate_n2o  = Variable(index=[time,4])
-    R_n2o           = Variable(index=[time,4]) # Quantity of agent in iᵗʰ atmospheric reservior (unit of E).
+    α_n2o           = Variable(index=[time])    # State-dependent multiplicative adjustment coefficient of reservior lifetimes.
+    n2o             = Variable(index=[time])    # Total atmospheric nitrous oxide concentrations (ppb).
+    GA_n2o          = Variable(index=[time])    # Atmospheric burden of agent above pre-industrial levels (unit of E).
+    GU_n2o          = Variable(index=[time])    # Cumulative uptake of agent since model initialization (unit of E⁻¹).
+    iIRFT100_n2o    = Variable(index=[time])    # 100-year integrated impulse response function (the average airborne fraction over a 100-year period).
+    decay_rate_n2o  = Variable(index=[time,4])  # Decay rates
+    R_n2o           = Variable(index=[time,4])  # Quantity of agent in iᵗʰ atmospheric reservior (unit of E).
 
 
     function run_timestep(p, v, d, t)

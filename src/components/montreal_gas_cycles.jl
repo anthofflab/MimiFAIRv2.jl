@@ -4,31 +4,31 @@
 
 @defcomp montreal_cycles begin
 
-    montreal_gases  = Index()                                            # Index for Ozone Depleting Substances controlled under the Montreal Protocol.
+    montreal_gases  = Index()   # Index for Ozone Depleting Substances controlled under the Montreal Protocol.
 
     montreal_0    		= Parameter(index=[montreal_gases]) # Montreal gas concentration in initial model period (ppb).
-    montreal_pi   		= Parameter(index=[montreal_gases])              # Pre-industrial Montreal gas concentrations (ppb).
+    montreal_pi   		= Parameter(index=[montreal_gases]) # Pre-industrial Montreal gas concentrations (ppb).
     g0_montreal   		= Parameter(index=[montreal_gases]) # Constant to set approximation of value for α equal to Millar et al. (2017) numerical solution for iIRF100 Montreal gas cycle parameterization at α=1.
     g1_montreal   		= Parameter(index=[montreal_gases]) # Constant to set approximation of gradient for α equal to Millar et al. (2017) numerical solution for iIRF100 Montreal gas cycle parameterization at α=1.
-    emiss2conc_montreal = Parameter(index=[montreal_gases])              # Conversion factor between emissions and concentrations.
+    emiss2conc_montreal = Parameter(index=[montreal_gases]) # Conversion factor between emissions and concentrations.
     GU_montreal_0       = Parameter(index=[montreal_gases]) # Initial model period value for cumulative uptake of agent (unit of E⁻¹).
-    r0_montreal   		= Parameter(index=[montreal_gases])              # Strength of pre-industrial uptake from atmosphere.
+    r0_montreal   		= Parameter(index=[montreal_gases]) # Strength of pre-industrial uptake from atmosphere.
     rA_montreal   		= Parameter(index=[montreal_gases]) # Sensitivity of uptake from atmosphere to current atmospheric burden of agent (unit of E⁻¹).
     rT_montreal   		= Parameter(index=[montreal_gases]) # Sensitivity of uptake from atmosphere to model temperature change since initialization (K⁻¹).
     rU_montreal   		= Parameter(index=[montreal_gases]) # Sensitivity of uptake from atmosphere to cumulative uptake of agent since model initialization (unit of E⁻¹).
-    τ_montreal    		= Parameter(index=[montreal_gases, 4])     # Atmospheric lifetime of gas in iᵗʰ reservior (years).
-    a_montreal    		= Parameter(index=[montreal_gases, 4])     # Fraction of emissions entering iᵗʰ Montreal gas reservior.
-    R0_montreal    		= Parameter(index=[montreal_gases, 4]) # Initial model period value for quantity of agent in iᵗʰ atmospheric reservior (unit of E).
-    E_montreal    		= Parameter(index=[time, montreal_gases])  # Annual Montreal gas emissions (Tg yr⁻¹).
-    Tj       		    = Parameter(index=[time, 3])  # Temperature change for three thermal pools (K).
+    τ_montreal    		= Parameter(index=[montreal_gases, 4])  # Atmospheric lifetime of gas in iᵗʰ reservior (years).
+    a_montreal    		= Parameter(index=[montreal_gases, 4])  # Fraction of emissions entering iᵗʰ Montreal gas reservior.
+    R0_montreal    		= Parameter(index=[montreal_gases, 4])  # Initial model period value for quantity of agent in iᵗʰ atmospheric reservior (unit of E).
+    E_montreal    		= Parameter(index=[time, montreal_gases])   # Annual Montreal gas emissions (Tg yr⁻¹).
+    Tj       		    = Parameter(index=[time, 3])    # Temperature change for three thermal pools (K).
 
     α_montreal           = Variable(index=[time, montreal_gases])   # State-dependent multiplicative adjustment coefficient of reservior lifetimes.
     montreal_conc        = Variable(index=[time, montreal_gases])   # Total atmospheric Montreal gas concentrations (ppb).
     GA_montreal          = Variable(index=[time, montreal_gases])   # Atmospheric burden of agent above pre-industrial levels (unit of E).
     GU_montreal          = Variable(index=[time, montreal_gases])   # Cumulative uptake of agent since model initialization (unit of E⁻¹).
     iIRFT100_montreal    = Variable(index=[time, montreal_gases])   # 100-year integrated impulse response function (the average airborne fraction over a 100-year period).
-    decay_rate_montreal  = Variable(index=[time, montreal_gases, 4])
-    R_montreal           = Variable(index=[time, montreal_gases, 4]) # Quantity of agent in iᵗʰ atmospheric reservior (unit of E).
+    decay_rate_montreal  = Variable(index=[time, montreal_gases, 4])    # Decay rates
+    R_montreal           = Variable(index=[time, montreal_gases, 4])    # Quantity of agent in iᵗʰ atmospheric reservior (unit of E).
 
 
     function run_timestep(p, v, d, t)
