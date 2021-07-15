@@ -1,5 +1,5 @@
 name = "MimiFAIRv2"
-uui = "db6a9ac4-572f-40b4-b774-4040310d200a"
+uuid = "db6a9ac4-572f-40b4-b774-4040310d200a"
 version = "0.1.0-DEV"
 
 [deps]
