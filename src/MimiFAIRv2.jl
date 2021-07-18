@@ -28,7 +28,7 @@ function get_model(;emissions_forcing_scenario::String="ssp585", start_year::Int
 
     # TODO - should this warn or error?
     if start_year !== 1750
-        @warn "Model should not be set to start with a year differing from 1750."
+        # @warn "Model should not be set to start with a year differing from 1750."
     end 
 
  	# ---------------------------------------------
