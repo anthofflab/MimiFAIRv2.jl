@@ -27,9 +27,9 @@ to 5.22), and forcing from a doubling of CO₂ (default to 3.759).
 function get_model(;emissions_forcing_scenario::String="ssp585", start_year::Int=1750, end_year::Int=2500, TCR::Float64=1.79, RWF::Float64=0.552, F2x::Float64=3.759)
 
     # TODO - should this warn or error?
-    if start_year !== 1750
+    #if start_year !== 1750
         # @warn "Model should not be set to start with a year differing from 1750."
-    end 
+    #end 
 
  	# ---------------------------------------------
 	# ---------------------------------------------
@@ -49,9 +49,6 @@ function get_model(;emissions_forcing_scenario::String="ssp585", start_year::Int
 	# Load initial conditions for 1750 under the RCMIP emissions & forcing scenario.
 	init_gas_vals     = DataFrame(load(joinpath(@__DIR__, "..", "data", "fair_initial_gas_cycle_conditions_1750.csv"), skiplines_begin=7))
 	init_thermal_vals = DataFrame(load(joinpath(@__DIR__, "..", "data", "fair_initial_thermal_conditions_1750.csv"), skiplines_begin=7))
-
-	# Calculate exogenous effective radiative forcing values (sum of land use, solar, and volcanic forcings).
-	exogenous_forcing = sum(Array(forcing_data[:, [:land_use,:volcanic,:solar]]), dims=2)[:,1]
 
 	# Isolate specific gas parameters for convenience.
 	co2_p              = filter(:gas_name  => ==("carbon_dioxide"), gas_p)
@@ -275,7 +272,13 @@ function get_model(;emissions_forcing_scenario::String="ssp585", start_year::Int
 	update_param!(m, :radiative_forcing, :oc_aci_f, vec(Array(irf_p[(irf_p.indirect_forcing_effect.=="oc|aci"), [:f1, :f2, :f3]])))
 	update_param!(m, :radiative_forcing, :so2_f, vec(Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name.=="so2"), [:f1, :f2, :f3]])))
 	update_param!(m, :radiative_forcing, :so2_aci_f, vec(Array(irf_p[(irf_p.indirect_forcing_effect.=="so2|aci"), [:f1, :f2, :f3]])))
-  	update_param!(m, :radiative_forcing, :exogenous_RF, exogenous_forcing)
+  	update_param!(m, :radiative_forcing, :solar_f, 1.0)
+  	update_param!(m, :radiative_forcing, :landuse_f, 1.0)
+  	update_param!(m, :radiative_forcing, :volcanic_f, 1.0)
+  	update_param!(m, :radiative_forcing, :solar_RF, forcing_data[:, :solar])
+  	update_param!(m, :radiative_forcing, :landuse_RF, forcing_data[:, :land_use])
+  	update_param!(m, :radiative_forcing, :volcanic_RF, forcing_data[:, :volcanic])
+  	update_param!(m, :radiative_forcing, :other_RF, zeros(length(start_year:end_year)))
 
     # ---- Global Temperature Anomaly ---- #
     update_param!(m, :temperature, :Tj_0, vec(Array(init_thermal_vals[:,[:thermal_box_1,:thermal_box_2,:thermal_box_3]])))
