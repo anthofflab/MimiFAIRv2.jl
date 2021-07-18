@@ -58,11 +58,17 @@
     flourinated_f       = Parameter(index=[flourinated_gases, 3]) # f coefficient
 
     # Other parameters
-    exogenous_RF    = Parameter(index=[time])
-
+    solar_RF    = Parameter(index=[time])
+    volcanic_RF    = Parameter(index=[time])
+    landuse_RF    = Parameter(index=[time])
+    # Scaling parameters for exogenous sources
+    solar_f = Parameter()
+    volcanic_f  = Parameter()
+    landuse_f  = Parameter()
     ##
     ## Variables
     ##
+    other_RF = Parameter(index=[time])
 
     # CO2, CH4, and N2O variables
     co2_RF = Variable(index=[time])
@@ -162,6 +168,7 @@
                         v.bc_RF[t] + v.co_RF[t] + v.nh3_RF[t] + v.nmvoc_RF[t] + v.nox_RF[t] + v.nox_avi_RF[t] + v.oc_RF[t] + v.so2_RF[t] +
                         v.bc_snow_RF[t] + v.bc_aci_RF[t] + v.co_o3_RF[t] + v.nmvoc_o3_RF[t] + v.nox_o3_RF[t] + v.nox_avi_contrails_RF[t] + v.oc_aci_RF[t] + v.so2_aci_RF[t] +
                         sum(v.montreal_RF[t,:]) + sum(v.montreal_ind_RF[t,:]) + sum(v.flourinated_RF[t,:]) +
-                        p.exogenous_RF[t]
+                        p.solar_f * p.solar_RF[t] + p.landuse_f * p.landuse_RF[t] + p.volcanic_f * p.volcanic_RF[t] +
+                        p.other_RF[t]
     end
 end
