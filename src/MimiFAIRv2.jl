@@ -14,6 +14,10 @@ include("components/aerosol_plus_gas_cycles.jl")
 include("components/radiative_forcing.jl")
 include("components/temperature.jl")
 
+# load monte Carlo
+include("monte_carlo.jl")
+include("monte_carlo_1000.jl")
+
 """
     get_model(;emissions_forcing_scenario::String="ssp585", start_year::Int=1750, 
                 end_year::Int=2500, TCR::Float64=1.79, RWF::Float64=0.552, 
