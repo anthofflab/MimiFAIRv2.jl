@@ -342,10 +342,16 @@ function create_fair_monte_carlo(n_samples::Int;
             run(fair)
 
             # Store temperature projections.
-            temperatures[:,i] = fair[:temperature, :T]
+            temperatures[:,i] = fair[:temperature, :T] # Global mean surface temperature anomaly (K)
+            E_co2[:,i] = fair[:co2_cycle, :E_co2]  # Annual carbon dioxide emissions (GtC yr⁻¹)
+            E_n2o[:,i] = fair[:n2o_cycle, :E_n2o]  # Annual nitrous oxide emissions (TgN yr⁻¹)
+            E_ch4[:,i] = fair[:ch4_cycle, :E_ch4]  # Annual methane emissions (TgCH₄ yr⁻¹)
+            E_co2_ppm[:,i] = fair[:co2_cycle, :E_co2] # # Total atmospheric carbon dioxide concentrations (ppm)
+            rf[:, i] = fair[:E_radiative_forcing, :total_RF] # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
+
         end
-        # Return temperature projections.
-        return temperatures
+        # Return temperature projections, and other variables of interest.
+        return Dict(temperatures => temperatures, E_co2 => E_co2, E_n2o => E_n2o, E_ch4 => E_ch4, E_co2_ppm => E_co2_ppm, rf => rf)
     end
 
     # Return 'fair_monte_carlo' function.
