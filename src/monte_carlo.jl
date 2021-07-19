@@ -12,13 +12,19 @@
 #       emissions_scenario: Current options are: "ssp119", "ssp126", "ssp245", "ssp370", "ssp585"
 #       start_year:         First year to run the model (note, Mimi-FAIR requires user-supplied initial conditions if not starting in 1765).
 #       end_year:           Final year to run the model.
+#       data_dir:           Location of the data files
 #----------------------------------------------------------------------------------------------------------------------
 
 # Load packages.
 using CSVFiles, DataFrames, Mimi, MimiFAIRv2, StatsBase
 
 
-function create_fair_monte_carlo(n_samples::Int; emissions_scenario::String="ssp585", start_year::Int=2000, end_year::Int=2300)
+function create_fair_monte_carlo(n_samples::Int; 
+                                emissions_scenario::String="ssp585", 
+                                start_year::Int=2000, 
+                                end_year::Int=2300, 
+                                data_dir::String = joinpath(@__DIR__, "..", "data", "constrained_parameters")
+                                )
 
     #Load constrained FAIR parameters from Leach et al. (2021).
     thermal_params           = DataFrame(load(joinpath(@__DIR__, "..", "data", "constrained_parameters", "julia_constrained_thermal_parameters_average_probs.csv")))
@@ -193,9 +199,22 @@ function create_fair_monte_carlo(n_samples::Int; emissions_scenario::String="ssp
 
 
     # Create a function to carry out the actual Monte Carlo analysis (passing in sampled constrained parameter values).
-    function fair_monte_carlo()
+    function fair_monte_carlo(  co2_emissions_trajectories::Union{Nothing, Vector{Vector{Float64}}};
+                                n2o_emissions_trajectories::Union{Nothing, Vector{Vector{Float64}}} = nothing,
+                                ch4_emissions_trajectories::Union{Nothing, Vector{Vector{Float64}}} = nothing)
 
         for i = 1:n_samples
+
+            # ---- Emissions Trajectories ---- #
+            if !(isnothing(n2o_emissions_trajectories))
+                update_param!(fair, :co2_cycle, :E_co2, co2_emissions_trajectories[i])
+            end
+            if !(isnothing(n2o_emissions_trajectories))
+                update_param!(fair, :n2o_cycle, :E_n2o, n2o_emissions_trajectories[i])
+            end
+            if !(isnothing(ch4_emissions_trajectories))
+                update_param!(fair, :ch4_cycle, :E_ch4, ch4_emissions_trajectories[i])
+            end
 
             # ---- Global Temperature Anomaly ---- #
             update_param!(fair, :temperature, :decay_factor, thermal_decay_factors[i])
