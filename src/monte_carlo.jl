@@ -341,7 +341,7 @@ function create_fair_monte_carlo(n_samples::Int;
             # Run model.
             run(fair)
 
-            # Store temperature projections.
+            # Store projections.
             temperatures[:,i] = fair[:temperature, :T] # Global mean surface temperature anomaly (K)
             E_co2[:,i] = fair[:co2_cycle, :E_co2]  # Annual carbon dioxide emissions (GtC yr⁻¹)
             E_n2o[:,i] = fair[:n2o_cycle, :E_n2o]  # Annual nitrous oxide emissions (TgN yr⁻¹)
