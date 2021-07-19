@@ -186,7 +186,7 @@ function create_fair_monte_carlo(n_samples::Int;
     end
 
     #Calculate thermal decay factors, defined as exp(-1/d).
-    thermal_decay_factors = exp.(-1.0 ./ vec(Array(thermal_params[:,[:d1,:d2,:d3]])))
+    thermal_decay_factors = exp.(-1.0 ./ Array(thermal_params[:,[:d1,:d2,:d3]]))
 
     # Iniitlaize an array to store FAIR temperature projections.
     temperatures = zeros(length(2000:2300), n_samples)
@@ -217,7 +217,7 @@ function create_fair_monte_carlo(n_samples::Int;
             end
 
             # ---- Global Temperature Anomaly ---- #
-            update_param!(fair, :temperature, :decay_factor, thermal_decay_factors[i])
+            update_param!(fair, :temperature, :decay_factor, thermal_decay_factors[i,:])
             update_param!(fair, :temperature, :q, Array(thermal_params[i,[:q1,:q2,:q3]]))
             #update_param!(fair, :temperature, :Tj_0, vec(Array(init_thermal_vals[:,[:thermal_box_1,:thermal_box_2,:thermal_box_3]])))
             #update_param!(fair, :temperature, :T_0, init_thermal_vals.global_temp_anomaly[1])
@@ -334,8 +334,8 @@ function create_fair_monte_carlo(n_samples::Int;
             update_param!(fair, :shared_co2_pi, co2_p[i, :PI_conc])
             update_param!(fair, :shared_ch4_pi, ch4_p[i, :PI_conc])
             update_param!(fair, :shared_n2o_pi, n2o_p[i, :PI_conc])
-            update_param!(fair, :shared_montreal_pi, aerosol_plus_pi_conc[:,i])
-            update_param!(fair, :shared_flourinated_pi, aerosol_plus_pi_conc[:,i])
+            update_param!(fair, :shared_montreal_pi, montreal_pi_conc[:,i])
+            update_param!(fair, :shared_flourinated_pi, flourinated_pi_conc[:,i])
             update_param!(fair, :shared_aerosol_plus_pi, aerosol_plus_pi_conc[:,i])
 
             # Run model.
