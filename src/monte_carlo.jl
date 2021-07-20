@@ -356,7 +356,7 @@ function create_fair_monte_carlo(n_samples::Int;
 
         end
         # Return temperature projections, and other variables of interest.
-        return Dict(temperatures => temperatures, E_co2 => E_co2, E_n2o => E_n2o, E_ch4 => E_ch4, E_co2_ppm => E_co2_ppm, rf => rf)
+        return Dict(:temperatures => temperatures, :E_co2 => E_co2, :E_n2o => E_n2o, :E_ch4 => E_ch4, :E_co2_ppm => E_co2_ppm, :rf => rf)
     end
 
     # Return 'fair_monte_carlo' function.
