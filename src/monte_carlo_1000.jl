@@ -219,7 +219,7 @@ function create_fair_monte_carlo_1000(;n_samples::Int=1000, emissions_scenario::
 
     #Calculate thermal decay factors, defined as exp(-1/d).
     thermal_decay_factors = exp.(-1.0 ./ Array(thermal_params[:,[:d1,:d2,:d3]]))
-    
+
     # Initialize an array to store FAIR temperature projections.
     temperatures = zeros(length(start_year:end_year), n_samples)  # Global mean surface temperature anomaly (K)
     E_co2  = zeros(length(start_year:end_year), n_samples)        # Annual carbon dioxide emissions (GtC yr⁻¹)
@@ -385,7 +385,7 @@ function create_fair_monte_carlo_1000(;n_samples::Int=1000, emissions_scenario::
             E_n2o[:,i] = fair[:n2o_cycle, :E_n2o]       # Annual nitrous oxide emissions (TgN yr⁻¹)
             E_ch4[:,i] = fair[:ch4_cycle, :E_ch4]       # Annual methane emissions (TgCH₄ yr⁻¹)
             E_co2_ppm[:,i] = fair[:co2_cycle, :E_co2]   # Total atmospheric carbon dioxide concentrations (ppm)
-            rf[:, i] = fair[:E_radiative_forcing, :total_RF] # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
+            rf[:, i] = fair[:total_RF, :E_radiative_forcing] # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
 
         end
         # Return temperature projections, and other variables of interest.
