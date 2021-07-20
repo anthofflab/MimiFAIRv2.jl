@@ -385,7 +385,7 @@ function create_fair_monte_carlo_1000(;n_samples::Int=1000, emissions_scenario::
             E_n2o[:,i] = fair[:n2o_cycle, :E_n2o]       # Annual nitrous oxide emissions (TgN yr⁻¹)
             E_ch4[:,i] = fair[:ch4_cycle, :E_ch4]       # Annual methane emissions (TgCH₄ yr⁻¹)
             E_co2_ppm[:,i] = fair[:co2_cycle, :E_co2]   # Total atmospheric carbon dioxide concentrations (ppm)
-            rf[:, i] = fair[:total_RF, :E_radiative_forcing] # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
+            rf[:, i] = fair[:radiative_forcing, :total_RFf] # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
 
         end
         # Return temperature projections, and other variables of interest.
