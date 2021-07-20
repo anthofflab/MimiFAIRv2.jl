@@ -347,9 +347,9 @@ function create_fair_monte_carlo(n_samples::Int;
             rf[:, i] = fair[:radiative_forcing, :total_RF] # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
 
         end
-        
+
         # Return temperature projections and radiative forcing projections
-        return temperatures, rf
+        return Dict(:temperatures => temperatures, :rf => rf)
     end
 
     # Return 'fair_monte_carlo' function.
