@@ -204,21 +204,21 @@ function create_fair_monte_carlo(n_samples::Int;
 
 
     # Create a function to carry out the actual Monte Carlo analysis (passing in sampled constrained parameter values).
-    function fair_monte_carlo(  ;co2_emissions_trajectories::Union{Nothing, Vector{Vector{Float64}}} = nothing,
-                                n2o_emissions_trajectories::Union{Nothing, Vector{Vector{Float64}}} = nothing,
-                                ch4_emissions_trajectories::Union{Nothing, Vector{Vector{Float64}}} = nothing)
+    function fair_monte_carlo(  ;co2_em_vals::Union{Nothing, Vector{Vector{Float64}}} = nothing,
+                                n2o_em_vals::Union{Nothing, Vector{Vector{Float64}}} = nothing,
+                                ch4_em_vals::Union{Nothing, Vector{Vector{Float64}}} = nothing)
 
         for i = 1:n_samples
 
             # ---- Emissions Trajectories ---- #
-            if !(isnothing(co2_emissions_trajectories))
-                update_param!(fair, :co2_cycle, :E_co2, co2_emissions_trajectories[i])
+            if !(isnothing(co2_em_vals))
+                update_param!(fair, :co2_cycle, :E_co2, co2_em_vals[i])
             end
-            if !(isnothing(n2o_emissions_trajectories))
-                update_param!(fair, :n2o_cycle, :E_n2o, n2o_emissions_trajectories[i])
+            if !(isnothing(n2o_em_vals))
+                update_param!(fair, :n2o_cycle, :E_n2o, n2o_em_vals[i])
             end
-            if !(isnothing(ch4_emissions_trajectories))
-                update_param!(fair, :ch4_cycle, :E_ch4, ch4_emissions_trajectories[i])
+            if !(isnothing(ch4_em_vals))
+                update_param!(fair, :ch4_cycle, :E_ch4, ch4_em_vals[i])
             end
 
             # ---- Global Temperature Anomaly ---- #
