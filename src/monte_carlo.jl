@@ -199,7 +199,7 @@ function create_fair_monte_carlo(n_samples::Int;
 
 
     # Create a function to carry out the actual Monte Carlo analysis (passing in sampled constrained parameter values).
-    function fair_monte_carlo(  co2_emissions_trajectories::Union{Nothing, Vector{Vector{Float64}}} = nothing;
+    function fair_monte_carlo(  ;co2_emissions_trajectories::Union{Nothing, Vector{Vector{Float64}}} = nothing,
                                 n2o_emissions_trajectories::Union{Nothing, Vector{Vector{Float64}}} = nothing,
                                 ch4_emissions_trajectories::Union{Nothing, Vector{Vector{Float64}}} = nothing)
 
