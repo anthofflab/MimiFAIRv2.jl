@@ -190,10 +190,6 @@ function create_fair_monte_carlo(n_samples::Int;
 
     # Initialize an array to store FAIR temperature projections.
     temperatures = zeros(length(start_year:end_year), n_samples)  # Global mean surface temperature anomaly (K)
-    E_co2  = zeros(length(start_year:end_year), n_samples)        # Annual carbon dioxide emissions (GtC yr⁻¹)
-    E_n2o = zeros(length(start_year:end_year), n_samples)         # Annual nitrous oxide emissions (TgN yr⁻¹)
-    E_ch4 = zeros(length(start_year:end_year), n_samples)         # Annual methane emissions (TgCH₄ yr⁻¹)
-    E_co2_ppm = zeros(length(start_year:end_year), n_samples)     # Total atmospheric carbon dioxide concentrations (ppm)
     rf = zeros(length(start_year:end_year), n_samples)            # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
 
     # Load an instance of FAIR with user-specificed settings.
@@ -348,15 +344,12 @@ function create_fair_monte_carlo(n_samples::Int;
 
             # Store projections.
             temperatures[:,i] = fair[:temperature, :T] # Global mean surface temperature anomaly (K)
-            E_co2[:,i] = fair[:co2_cycle, :E_co2]  # Annual carbon dioxide emissions (GtC yr⁻¹)
-            E_n2o[:,i] = fair[:n2o_cycle, :E_n2o]  # Annual nitrous oxide emissions (TgN yr⁻¹)
-            E_ch4[:,i] = fair[:ch4_cycle, :E_ch4]  # Annual methane emissions (TgCH₄ yr⁻¹)
-            E_co2_ppm[:,i] = fair[:co2_cycle, :E_co2] # # Total atmospheric carbon dioxide concentrations (ppm)
             rf[:, i] = fair[:radiative_forcing, :total_RF] # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
 
         end
-        # Return temperature projections, and other variables of interest.
-        return Dict(:temperatures => temperatures, :E_co2 => E_co2, :E_n2o => E_n2o, :E_ch4 => E_ch4, :E_co2_ppm => E_co2_ppm, :rf => rf)
+        
+        # Return temperature projections and radiative forcing projections
+        return temperatures, rf
     end
 
     # Return 'fair_monte_carlo' function.
