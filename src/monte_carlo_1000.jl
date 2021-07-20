@@ -244,7 +244,7 @@ function create_fair_monte_carlo_1000(;n_samples::Int=1000, emissions_scenario::
         for i = 1:n_samples
 
             # ---- Emissions Trajectories ---- #
-            if !(isnothing(n2o_emissions_trajectories))
+            if !(isnothing(co2_emissions_trajectories))
                 update_param!(fair, :co2_cycle, :E_co2, co2_emissions_trajectories[i])
             end
             if !(isnothing(n2o_emissions_trajectories))
