@@ -383,7 +383,7 @@ function create_fair_monte_carlo_1000(;n_samples::Int=1000, emissions_scenario::
         end
 
         # Return temperature and radiative forcing 
-        return Dict(:temperatures => temperatures, :rf => rf)
+        return Dict(:temperatures => temperatures, :rf => rf, :co2 => co2)
     end
 
     # Return 'fair_monte_carlo' function.
