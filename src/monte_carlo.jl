@@ -191,6 +191,7 @@ function create_fair_monte_carlo(n_samples::Int;
     # Initialize an array to store FAIR temperature projections.
     temperatures = zeros(length(start_year:end_year), n_samples)  # Global mean surface temperature anomaly (K)
     rf = zeros(length(start_year:end_year), n_samples)            # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
+    co2 = zeros(length(start_year:end_year), n_samples)           # Total atmospheric carbon dioxide concentrations (ppm).
 
     # Load an instance of FAIR with user-specificed settings.
     fair_raw = MimiFAIRv2.get_model(emissions_forcing_scenario=emissions_scenario, start_year=start_year, end_year=end_year)
@@ -345,11 +346,12 @@ function create_fair_monte_carlo(n_samples::Int;
             # Store projections.
             temperatures[:,i] = fair[:temperature, :T] # Global mean surface temperature anomaly (K)
             rf[:, i] = fair[:radiative_forcing, :total_RF] # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
+            co2[:, i] = fair[:co2_cycle, :co2]  # Total atmospheric carbon dioxide concentrations (ppm).
 
         end
 
         # Return temperature projections and radiative forcing projections
-        return Dict(:temperatures => temperatures, :rf => rf)
+        return Dict(:temperatures => temperatures, :rf => rf, :co2 => co2)
     end
 
     # Return 'fair_monte_carlo' function.
