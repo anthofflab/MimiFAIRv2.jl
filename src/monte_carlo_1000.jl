@@ -224,7 +224,9 @@ function create_fair_monte_carlo_1000(;n_samples::Int=1000, emissions_scenario::
     temperatures = zeros(length(start_year:end_year), n_samples)  # Global mean surface temperature anomaly (K)
     rf = zeros(length(start_year:end_year), n_samples)            # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
     co2 = zeros(length(start_year:end_year), n_samples)           # Total atmospheric carbon dioxide concentrations (ppm).
-    
+    ch4 = zeros(length(start_year:end_year), n_samples)           # Total atmospheric methane concentrations (ppb)
+    n2o = zeros(length(start_year:end_year), n_samples)           # Total atmospheric nitrous oxide concentrations (ppb).
+
     # Load an instance of FAIR with user-specificed settings.
     fair_raw = MimiFAIRv2.get_model(emissions_forcing_scenario=emissions_scenario, start_year=start_year, end_year=end_year)
 
@@ -378,12 +380,14 @@ function create_fair_monte_carlo_1000(;n_samples::Int=1000, emissions_scenario::
             # Store projections.
             temperatures[:,i] = fair[:temperature, :T]  # Global mean surface temperature anomaly (K)
             rf[:, i] = fair[:radiative_forcing, :total_RF] # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
-            co2[:, i] = fair[:co2_cycle, :co2]  # Total atmospheric carbon dioxide concentrations (ppm).
+            co2[:, i] = fair[:co2_cycle, :co2]  # Total atmospheric carbon dioxide concentrations (ppm)
+            ch4[:, i] = fair[:ch4_cycle, :ch4]  # Total atmospheric methane concentrations (ppb)
+            n2o[:, i] = fair[:n2o_cycle, :n2o]  # Total atmospheric nitrous oxide concentrations (ppb)
 
         end
 
         # Return temperature and radiative forcing 
-        return Dict(:temperatures => temperatures, :rf => rf, :co2 => co2)
+        return Dict(:temperatures => temperatures, :rf => rf, :co2 => co2, :ch4 => ch4, :n2o => n2o)
     end
 
     # Return 'fair_monte_carlo' function.
