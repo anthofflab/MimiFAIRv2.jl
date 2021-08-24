@@ -8,7 +8,7 @@
 #
 # Function Arguments:
 #
-#       n_samples:          Number of samples to randomly draw from original constrained parameter values (max = 9,995).
+#       n_samples:          Number of samples to randomly draw from original constrained parameter values (max = 93,995).
 #       emissions_scenario: Current options are: "ssp119", "ssp126", "ssp245", "ssp370", "ssp585"
 #       start_year:         First year to run the model (note, Mimi-FAIR requires user-supplied initial conditions if not starting in 1765).
 #       end_year:           Final year to run the model.
