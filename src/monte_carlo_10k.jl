@@ -18,17 +18,17 @@
 using CSVFiles, DataFrames, Mimi, MimiFAIRv2, StatsBase
 
 
-function create_fair_monte_carlo_10000(;n_samples::Int=10000, emissions_scenario::String="ssp585", start_year::Int=2000, end_year::Int=2300)
+function create_fair_monte_carlo_10k(;n_samples::Int=10_000, emissions_scenario::String="ssp585", start_year::Int=2000, end_year::Int=2300)
 
     #Load constrained FAIR parameters from Leach et al. (2021).
-    thermal_params           = DataFrame(load(joinpath(@__DIR__, "..", "data", "constrained_parameters", "julia_constrained_thermal_parameters_average_probs_10000.csv")))
-    gas_params               = DataFrame(load(joinpath(@__DIR__, "..", "data", "constrained_parameters", "julia_constrained_gas_cycle_parameters_average_probs_10000.csv")))
-    indirect_forcing_params  = DataFrame(load(joinpath(@__DIR__, "..", "data", "constrained_parameters", "julia_constrained_indirect_forcing_parameters_average_probs_10000.csv")))
-    exogenous_forcing_params = DataFrame(load(joinpath(@__DIR__, "..", "data", "constrained_parameters", "julia_constrained_exogenous_forcing_parameters_average_probs_10000.csv")))
+    thermal_params           = DataFrame(load(joinpath(@__DIR__, "..", "data", "constrained_parameters", "julia_constrained_thermal_parameters_average_probs_10k.csv")))
+    gas_params               = DataFrame(load(joinpath(@__DIR__, "..", "data", "constrained_parameters", "julia_constrained_gas_cycle_parameters_average_probs_10k.csv")))
+    indirect_forcing_params  = DataFrame(load(joinpath(@__DIR__, "..", "data", "constrained_parameters", "julia_constrained_indirect_forcing_parameters_average_probs_10k.csv")))
+    exogenous_forcing_params = DataFrame(load(joinpath(@__DIR__, "..", "data", "constrained_parameters", "julia_constrained_exogenous_forcing_parameters_average_probs_10k.csv")))
 
     # Load sample-specific initial conditions (defaults for the year 2000 as initial year).
-    thermal_initial_conditions   = DataFrame(load(joinpath(@__DIR__, "..", "data", "constrained_parameters", "initial_thermal_conditions_constrained_average_probs_10000.csv")))
-    gas_cycle_initial_conditions = DataFrame(load(joinpath(@__DIR__, "..", "data", "constrained_parameters", "initial_gas_cycle_conditions_constrained_average_probs_10000.csv")))
+    thermal_initial_conditions   = DataFrame(load(joinpath(@__DIR__, "..", "data", "constrained_parameters", "initial_thermal_conditions_constrained_average_probs_10k.csv")))
+    gas_cycle_initial_conditions = DataFrame(load(joinpath(@__DIR__, "..", "data", "constrained_parameters", "initial_gas_cycle_conditions_constrained_average_probs_10k.csv")))
 
     # Get FAIR sample id values from subsetted data (for indexing data).
     sample_id_subset = sort(thermal_params.sample_id)
@@ -235,7 +235,7 @@ function create_fair_monte_carlo_10000(;n_samples::Int=10000, emissions_scenario
 
 
     # Create a function to carry out the actual Monte Carlo analysis (passing in sampled constrained parameter values).
-    function fair_monte_carlo_10000( ;co2_em_vals::Union{Nothing, Vector{Vector{Float64}}} = nothing,
+    function fair_monte_carlo_10k( ;co2_em_vals::Union{Nothing, Vector{Vector{Float64}}} = nothing,
                                     n2o_em_vals::Union{Nothing, Vector{Vector{Float64}}} = nothing,
                                     ch4_em_vals::Union{Nothing, Vector{Vector{Float64}}} = nothing)
 
@@ -391,5 +391,5 @@ function create_fair_monte_carlo_10000(;n_samples::Int=10000, emissions_scenario
     end
 
     # Return 'fair_monte_carlo' function.
-    return fair_monte_carlo_10000
+    return fair_monte_carlo_10k
 end
