@@ -10,10 +10,6 @@ To add the package to your current environment, run the following command at the
 pkg> add https://github.com/FrankErrickson/MimiFAIRv2.jl.git
 ```
 
-```julia
-include("src/MimiFAIRv2.jl") # load the MimiFAIRv2 module 
-```
-
 You probably also want to install the Mimi package into your julia environment, so that you can use some of the tools in there:
 
 ```julia
