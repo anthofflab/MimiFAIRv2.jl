@@ -4,7 +4,13 @@
 # Description: This file contains functions to run a Monte Carlo with MimiFAIRv2 using the constrained parameters from
 #              Leach et al. (2021). The first function, "create_fair_monte_carlo" loads the constrained parameter
 #              samples from Leach et al. (2021) and cleans them up so they can be easily passed into Mimi-FAIRv2.0. It
-#              then creates a second function, "fair_monte_carlo" that performs the actual analysis.
+#              then creates a second function, "fair_monte_carlo" that performs the actual analysis. This function returns
+#              a dictionary with temperature, atmospheric co2, ch4, and n2o, and radiative forcing.  Adding other outputs
+#              is doable please add an Issue on Github if you would like this to be done.
+#
+#               The required constrained parameter files are uploaded to Zenodo with the citation Frank Errickson, 
+#               & Lisa Rennels. (2021). MimiFAIRV2 Large Data File Storage (0.1.0-DEV) [Data set]. Zenodo. 
+#               https://doi.org/10.5281/zenodo.5513221
 #
 # Function Arguments:
 #
@@ -27,7 +33,8 @@ function create_fair_monte_carlo(n_samples::Int;
                                 start_year::Int=1750, 
                                 end_year::Int=2300, 
                                 data_dir::String = joinpath(@__DIR__, "..", "data", "large_constrained_parameter_files"),
-                                sample_id_subset::Union{Vector, Nothing} = nothing
+                                sample_id_subset::Union{Vector, Nothing} = nothing,
+                                delete_downloaded_data::Bool = true
                                 )
 
     if start_year !== 1750
@@ -222,6 +229,8 @@ function create_fair_monte_carlo(n_samples::Int;
     temperatures = zeros(length(start_year:end_year), n_samples)  # Global mean surface temperature anomaly (K)
     rf = zeros(length(start_year:end_year), n_samples)            # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
     co2 = zeros(length(start_year:end_year), n_samples)           # Total atmospheric carbon dioxide concentrations (ppm).
+    ch4 = zeros(length(start_year:end_year), n_samples)           # Total atmospheric methane concentrations (ppb)
+    n2o = zeros(length(start_year:end_year), n_samples)           # Total atmospheric nitrous oxide concentrations (ppb).
 
     # Load an instance of FAIR with user-specificed settings.
     fair_raw = MimiFAIRv2.get_model(emissions_forcing_scenario=emissions_scenario, start_year=start_year, end_year=end_year)
@@ -377,6 +386,8 @@ function create_fair_monte_carlo(n_samples::Int;
             temperatures[:,i] = fair[:temperature, :T] # Global mean surface temperature anomaly (K)
             rf[:, i] = fair[:radiative_forcing, :total_RF] # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
             co2[:, i] = fair[:co2_cycle, :co2]  # Total atmospheric carbon dioxide concentrations (ppm).
+            ch4[:, i] = fair[:ch4_cycle, :ch4]  # Total atmospheric methane concentrations (ppb)
+            n2o[:, i] = fair[:n2o_cycle, :n2o]  # Total atmospheric nitrous oxide concentrations (ppb)
 
         end
 
@@ -385,8 +396,9 @@ function create_fair_monte_carlo(n_samples::Int;
     end
 
     # Recursively delete the constrained files downloaded
-    rm(data_dir, recursive = true)
-
+    if delete_downloaded_data
+        rm(data_dir, recursive = true)
+    end
     # Return 'fair_monte_carlo' function.
     return fair_monte_carlo
 

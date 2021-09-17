@@ -53,3 +53,7 @@ The `get_model()` function currently has the following keyword arguments:
 \
 \
 ![Python vs. Julia temperature comparison](https://github.com/FrankErrickson/MimiFAIRv2.jl/blob/main/data/python_replication_data/Python_Mimi_FAIR2_temperature_comparison.png)
+
+## Running a Monte Carlo Simulation
+
+See `monte_carlo.jl` for details on running a Monte Carlo Simulation, and don't hesitate to contact the developers with any questions, or post an Issue on Github.
