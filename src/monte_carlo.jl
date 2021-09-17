@@ -43,7 +43,9 @@ function create_fair_monte_carlo(n_samples::Int;
     # Create random indices and create a subset of FAIR sample id values (for indexing data) if they were not provided directly by the user with the
     # optional sample_id_subset parameter.
     if isnothing(sample_id_subset)
-        rand_indices     = sort(sample(1:93995, n_samples, replace=false))
+        # TODO should we be requiring input list to be ordered numerically before the "mem" prefix?  Don't see a strict reason to, and in prevoius use of 1000 and 10k versions 
+        # we sorted the strings, which gave different, non numerically sorted lists anyways
+        rand_indices     = sort(sample(1:93995, n_samples, replace=false)) 
         sample_id_subset = thermal_params[rand_indices, :sample_id]
     end
 
