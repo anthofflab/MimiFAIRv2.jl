@@ -15,7 +15,7 @@
 #       data_dir:           Location of the data files
 #       sample_id_subset:   IDs of the subset of samples to use from original constrained parameter values (each ID between 1 and 93,995 
 #                           inclusive). If this argument is set, it will be used instead of the step to create n random indices. The length 
-#                           must match n_samples. These sample indices should also be sorted in numerical order from smallest to largest.
+#                           must match n_samples.
 #----------------------------------------------------------------------------------------------------------------------
 
 # Load packages.
