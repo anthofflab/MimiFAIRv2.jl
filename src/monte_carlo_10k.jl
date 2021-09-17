@@ -10,7 +10,7 @@
 #
 #       n_samples:          Number of samples to draw from original constrained parameter values (max = 10,000).
 #       emissions_scenario: Current options are: "ssp119", "ssp126", "ssp245", "ssp370", "ssp585"
-#       start_year:         First year to run the model (note, Mimi-FAIR requires user-supplied initial conditions if not starting in 1765).
+#       start_year:         First year to run the model (note, Mimi-FAIR requires user-supplied initial conditions if not starting in 1750).
 #       end_year:           Final year to run the model.
 #----------------------------------------------------------------------------------------------------------------------
 

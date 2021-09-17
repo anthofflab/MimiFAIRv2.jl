@@ -10,9 +10,12 @@
 #
 #       n_samples:          Number of samples to randomly draw from original constrained parameter values (max = 93,995).
 #       emissions_scenario: Current options are: "ssp119", "ssp126", "ssp245", "ssp370", "ssp585"
-#       start_year:         First year to run the model (note, Mimi-FAIR requires user-supplied initial conditions if not starting in 1765).
+#       start_year:         First year to run the model (note, Mimi-FAIR requires user-supplied initial conditions if not starting in 1750).
 #       end_year:           Final year to run the model.
 #       data_dir:           Location of the data files
+#       sample_id_subset:   IDs of the subset of samples to use from original constrained parameter values (each ID between 1 and 93,995 
+#                           inclusive). If this argument is set, it will be used instead of the step to create n random indices. The length 
+#                           must match n_samples. These sample indices should also be sorted in numerical order from smallest to largest.
 #----------------------------------------------------------------------------------------------------------------------
 
 # Load packages.
@@ -23,18 +26,26 @@ function create_fair_monte_carlo(n_samples::Int;
                                 emissions_scenario::String="ssp585", 
                                 start_year::Int=2000, 
                                 end_year::Int=2300, 
-                                data_dir::String = joinpath(@__DIR__, "..", "data", "constrained_parameters")
+                                data_dir::String = joinpath(@__DIR__, "..", "data", "constrained_parameters"),
+                                sample_id_subset::Union{Vector, Nothing} = nothing
                                 )
 
+    if start_year !== 1750
+        @warn("FAIRv2 model monte carlo simulation should not be set to start with a year differing from 1750 as initial conditions are not calibrated for a different start year!")
+    end 
+                            
     #Load constrained FAIR parameters from Leach et al. (2021).
     thermal_params           = DataFrame(load(joinpath(data_dir, "julia_constrained_thermal_parameters_average_probs.csv")))
     gas_params               = DataFrame(load(joinpath(data_dir, "constrained_parameters", "julia_constrained_gas_cycle_parameters_average_probs.csv")))
     indirect_forcing_params  = DataFrame(load(joinpath(data_dir, "data", "constrained_parameters", "julia_constrained_indirect_forcing_parameters_average_probs.csv")))
     exogenous_forcing_params = DataFrame(load(joinpath(data_dir, "data", "constrained_parameters", "julia_constrained_exogenous_forcing_parameters_average_probs.csv")))
 
-    # Create random indices and create a subset of FAIR sample id values (for indexing data).
-    rand_indices     = sort(sample(1:93995, n_samples, replace=false))
-    sample_id_subset = thermal_params[rand_indices, :sample_id]
+    # Create random indices and create a subset of FAIR sample id values (for indexing data) if they were not provided directly by the user with the
+    # optional sample_id_subset parameter.
+    if isnothing(sample_id_subset)
+        rand_indices     = sort(sample(1:93995, n_samples, replace=false))
+        sample_id_subset = thermal_params[rand_indices, :sample_id]
+    end
 
     # Subset constrained parameters using random sample id values.
     thermal_params           = thermal_params[findall((in)(sample_id_subset), thermal_params.sample_id), :]
