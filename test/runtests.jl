@@ -25,12 +25,8 @@ using MimiFAIRv2: get_model # load `get_model` function to avoid need for `MimiF
     fair_temps = m[:temperature, :T]
     @test length(fair_temps) == length(1750:2100)
 
-    # start year - should throw a warning if use a start year other than 1750
-    @test_logs (:warn,"FAIRv2 model monte carlo simulation should not be set to start with a year differing from 1750 as initial conditions are not calibrated for a different start year!") get_model(start_year = 1760)
-    m = get_model(start_year = 1760)
-    run(m)
-    fair_temps = m[:temperature, :T]
-    @test length(fair_temps) == length(1760:2500)
+    # start year - should error if use a start year other than 1750
+    @test_throws ErrorException get_model(start_year = 1760)
 
     # emissions scenario
     m1 = get_model(emissions_forcing_scenario = "ssp126")

@@ -19,23 +19,39 @@
 #----------------------------------------------------------------------------------------------------------------------
 
 # Load packages.
-using CSVFiles, DataFrames, Mimi, MimiFAIRv2, StatsBase
+using CSVFiles, DataFrames, Mimi, MimiFAIRv2, StatsBase, Downloads
 
 
 function create_fair_monte_carlo(n_samples::Int; 
                                 emissions_scenario::String="ssp585", 
-                                start_year::Int=2000, 
+                                start_year::Int=1750, 
                                 end_year::Int=2300, 
-                                data_dir::String = joinpath(@__DIR__, "..", "data", "constrained_parameters"),
+                                data_dir::String = joinpath(@__DIR__, "..", "data", "large_constrained_parameter_files"),
                                 sample_id_subset::Union{Vector, Nothing} = nothing
                                 )
 
     if start_year !== 1750
-        @warn("FAIRv2 model monte carlo simulation should not be set to start with a year differing from 1750 as initial conditions are not calibrated for a different start year!")
+        error("FAIRv2 model monte carlo simulation should not be set to start with a year differing from 1750 as initial conditions are not calibrated for a different start year!")
     end 
                             
-    #Load constrained FAIR parameters from Leach et al. (2021).
-    # TODO download these large files from external file source and remove all large files from the repository
+    # Load constrained FAIR parameters from Leach et al. (2021) which are pulled down viea zenodo links to a local directory and
+    # processed before being deleted at the end of this script.
+    isdir(data_dir) || mkpath(data_dir)
+    _download_paths = Dict(
+                :julia_constrained_thermal_parameters_average_probs => "https://zenodo.org/record/5513221/files/julia_constrained_thermal_parameters_average_probs.csv?download=1", 
+                :julia_constrained_gas_cycle_parameters_average_probs => "https://zenodo.org/record/5513221/files/julia_constrained_gas_cycle_parameters_average_probs.csv?download=1",
+                :julia_constrained_indirect_forcing_parameters_average_probs => "https://zenodo.org/record/5513221/files/julia_constrained_indirect_forcing_parameters_average_probs.csv?download=1", 
+                :julia_constrained_exogenous_forcing_parameters_average_probs => "https://zenodo.org/record/5513221/files/julia_constrained_exogenous_forcing_parameters_average_probs.csv?download=1", 
+    )
+
+    for (k, v) in _download_paths
+        local_path = joinpath(data_dir, string(k, ".csv"))
+        if !ispath(local_path) # not yet downloaded
+            println("\n Downloading $k from $v to $(local_path) \n")
+            Downloads.download(v, local_path)
+        end
+    end
+
     thermal_params           = DataFrame(load(joinpath(data_dir, "julia_constrained_thermal_parameters_average_probs.csv")))
     gas_params               = DataFrame(load(joinpath(data_dir, "julia_constrained_gas_cycle_parameters_average_probs.csv")))
     indirect_forcing_params  = DataFrame(load(joinpath(data_dir, "julia_constrained_indirect_forcing_parameters_average_probs.csv")))
@@ -368,6 +384,10 @@ function create_fair_monte_carlo(n_samples::Int;
         return Dict(:temperatures => temperatures, :rf => rf, :co2 => co2)
     end
 
+    # Recursively delete the constrained files downloaded
+    rm(data_dir, recursive = true)
+
     # Return 'fair_monte_carlo' function.
     return fair_monte_carlo
+
 end

@@ -33,7 +33,7 @@ function get_model(;emissions_forcing_scenario::String="ssp585", start_year::Int
 
     # TODO turning this off for now so it doesn't drive us nuts with 10k runs while we're generalizing this function
     # if start_year !== 1750
-    #     @warn("FAIRv2 model monte carlo simulation should not be set to start with a year differing from 1750 as initial conditions are not calibrated for a different start year!")
+    #     error("FAIRv2 model monte carlo simulation should not be set to start with a year differing from 1750 as initial conditions are not calibrated for a different start year!")
     # end 
 
  	# ---------------------------------------------

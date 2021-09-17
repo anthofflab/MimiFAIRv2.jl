@@ -1,4 +1,4 @@
 .DS_Store
 .vscode
 output/
-large_file_storage/
+data/large_constrained_parameter_files
