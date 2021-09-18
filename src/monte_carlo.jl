@@ -75,6 +75,14 @@ function create_fair_monte_carlo(n_samples::Int;
     if isnothing(sample_id_subset)
         rand_indices     = sort(sample(1:93995, n_samples, replace=false)) 
         sample_id_subset = thermal_params[rand_indices, :sample_id]
+    # Do some checks on the provided sample id subset
+    else
+        if length(sample_id_subset) > n_samples
+            @warn("Provided sample_id_subset has length $(length(sample_id_subset)) which is greater than the number of samples $n_samples to be run. Will run the first $n_samples of the provided ids.")
+            sample_id_subset = sample_id_subset[1:n_samples]
+        elseif length(sample_id_subset) < n_samples
+            error("Provided sample_id_subset has length $(length(sample_id_subset)) which is less than the number of samples $n_samples to be run.")
+        end
     end
 
     # Subset constrained parameters using random sample id values.
