@@ -22,6 +22,9 @@
 #       sample_id_subset:   IDs of the subset of samples to use from original constrained parameter values (each ID between 1 and 93,995 
 #                           inclusive). If this argument is set, it will be used instead of the step to create n random indices. The length 
 #                           must match n_samples.
+#       delete_downlaoded_data: Boolean (defaulting to false) to recursively delete all downloaded large data files of constrained parameters
+#                               at the end of the script.  Should be set to `false` if one will be running this several times and want to avoid 
+#                               re-downloading each time.
 #----------------------------------------------------------------------------------------------------------------------
 
 # Load packages.
@@ -41,8 +44,10 @@ function create_fair_monte_carlo(n_samples::Int;
         error("FAIRv2 model monte carlo simulation should not be set to start with a year differing from 1750 as initial conditions are not calibrated for a different start year!")
     end 
                             
-    # Load constrained FAIR parameters from Leach et al. (2021) which are pulled down viea zenodo links to a local directory and
-    # processed before being deleted at the end of this script.
+    # Load constrained FAIR parameters from Leach et al. (2021) 
+    
+    # Full files are pulled down via zenodo links to a local directory if they do
+    # not already exist in the repository relative path
     isdir(data_dir) || mkpath(data_dir)
     _download_paths = Dict(
                 :julia_constrained_thermal_parameters_average_probs => "https://zenodo.org/record/5513221/files/julia_constrained_thermal_parameters_average_probs.csv?download=1", 
@@ -59,6 +64,7 @@ function create_fair_monte_carlo(n_samples::Int;
         end
     end
 
+    # Load data
     thermal_params           = DataFrame(load(joinpath(data_dir, "julia_constrained_thermal_parameters_average_probs.csv")))
     gas_params               = DataFrame(load(joinpath(data_dir, "julia_constrained_gas_cycle_parameters_average_probs.csv")))
     indirect_forcing_params  = DataFrame(load(joinpath(data_dir, "julia_constrained_indirect_forcing_parameters_average_probs.csv")))
@@ -67,8 +73,6 @@ function create_fair_monte_carlo(n_samples::Int;
     # Create random indices and create a subset of FAIR sample id values (for indexing data) if they were not provided directly by the user with the
     # optional sample_id_subset parameter.
     if isnothing(sample_id_subset)
-        # TODO should we be requiring input list to be ordered numerically before the "mem" prefix?  Don't see a strict reason to, and in prevoius use of 1000 and 10k versions 
-        # we sorted the strings, which gave different, non numerically sorted lists anyways
         rand_indices     = sort(sample(1:93995, n_samples, replace=false)) 
         sample_id_subset = thermal_params[rand_indices, :sample_id]
     end
@@ -391,8 +395,9 @@ function create_fair_monte_carlo(n_samples::Int;
 
         end
 
-        # Return temperature projections and radiative forcing projections
-        return Dict(:temperatures => temperatures, :rf => rf, :co2 => co2)
+        # Return temperature and radiative forcing 
+        return Dict(:temperatures => temperatures, :rf => rf, :co2 => co2, :ch4 => ch4, :n2o => n2o)
+        
     end
 
     # Recursively delete the constrained files downloaded
