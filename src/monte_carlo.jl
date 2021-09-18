@@ -22,7 +22,7 @@
 #       sample_id_subset:   IDs of the subset of samples to use from original constrained parameter values (each ID between 1 and 93,995 
 #                           inclusive). If this argument is set, it will be used instead of the step to create n random indices. The length 
 #                           must match n_samples.
-#       delete_downlaoded_data: Boolean (defaulting to false) to recursively delete all downloaded large data files of constrained parameters
+#       delete_downloaded_data: Boolean (defaulting to false) to recursively delete all downloaded large data files of constrained parameters
 #                               at the end of the script.  Should be set to `false` if one will be running this several times and want to avoid 
 #                               re-downloading each time.
 #----------------------------------------------------------------------------------------------------------------------
