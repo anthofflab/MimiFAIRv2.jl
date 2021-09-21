@@ -255,7 +255,7 @@ function create_fair_monte_carlo(n_samples::Int;
     # TODO type parameterize this so it's clear we need to input either nothing or a vector of vectors
     function fair_monte_carlo(  ;co2_em_vals = nothing,
                                 n2o_em_vals = nothing,
-                                ch4_em_vals = nothing) where {T1, T2, T3}
+                                ch4_em_vals = nothing)
 
         for i = 1:n_samples
 
