@@ -257,9 +257,9 @@ function create_fair_monte_carlo(n_samples::Int;
 
     # Create a function to carry out the actual Monte Carlo analysis (passing in sampled constrained parameter values).
     # TODO type parameterize this so it's clear we need to input either nothing or a vector of vectors
-    function fair_monte_carlo(  ;co2_em_vals = nothing,
-                                n2o_em_vals = nothing,
-                                ch4_em_vals = nothing)
+    function fair_monte_carlo(  ;co2_em_vals::Union{Nothing, Vector{Vector{T1}}}  = nothing,
+                                n2o_em_vals::Union{Nothing, Vector{Vector{T2}}} = nothing,
+                                ch4_em_vals::Union{Nothing, Vector{Vector{T3}}} = nothing) where {T1, T2, T3}
 
         for i = 1:n_samples
 
@@ -276,7 +276,7 @@ function create_fair_monte_carlo(n_samples::Int;
             end
 
             if !(isnothing(n2o_em_vals))
-                    update_param!(fair, :n2o_cycle, :E_n2o, n2o_em_vals[i])
+                update_param!(fair, :n2o_cycle, :E_n2o, n2o_em_vals[i])
             else
                 update_param!(fair, :n2o_cycle, :E_n2o, n2o_default)
             end
