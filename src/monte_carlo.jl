@@ -250,6 +250,10 @@ function create_fair_monte_carlo(n_samples::Int;
     # Create a model instance to speed things up.
     fair = Mimi.build(fair_raw)
 
+    # Gather default emissions data
+    co2_default = fair[:co2_cycle, :E_co2]
+    n2o_default = fair[:n2o_cycle, :E_n2o]
+    ch4_default = fair[:ch4_cycle, :E_ch4]
 
     # Create a function to carry out the actual Monte Carlo analysis (passing in sampled constrained parameter values).
     # TODO type parameterize this so it's clear we need to input either nothing or a vector of vectors
@@ -260,14 +264,27 @@ function create_fair_monte_carlo(n_samples::Int;
         for i = 1:n_samples
 
             # ---- Emissions Trajectories ---- #
+
+            # we need to make sure that the fair model has the default co2, n2o, and ch4 settings if none have been entered,
+            # in case a modified verison of fair is sitting around in the namespace, thus the calls to update_param! after 
+            # the else clause
+
             if !(isnothing(co2_em_vals))
                 update_param!(fair, :co2_cycle, :E_co2, co2_em_vals[i])
+            else
+                update_param!(fair, :co2_cycle, :E_co2, co2_default)
             end
+
             if !(isnothing(n2o_em_vals))
-                update_param!(fair, :n2o_cycle, :E_n2o, n2o_em_vals[i])
+                    update_param!(fair, :n2o_cycle, :E_n2o, n2o_em_vals[i])
+            else
+                update_param!(fair, :n2o_cycle, :E_n2o, n2o_default)
             end
+            
             if !(isnothing(ch4_em_vals))
                 update_param!(fair, :ch4_cycle, :E_ch4, ch4_em_vals[i])
+            else
+                update_param!(fair, :ch4_cycle, :E_ch4, ch4_default)
             end
 
             # ---- Global Temperature Anomaly ---- #
