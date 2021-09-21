@@ -237,32 +237,27 @@ function create_fair_monte_carlo(n_samples::Int;
     #Calculate thermal decay factors, defined as exp(-1/d).
     thermal_decay_factors = exp.(-1.0 ./ Array(thermal_params[:,[:d1,:d2,:d3]]))
 
-    # Initialize an array to store FAIR temperature projections.
-    temperatures = zeros(length(start_year:end_year), n_samples)  # Global mean surface temperature anomaly (K)
-    rf = zeros(length(start_year:end_year), n_samples)            # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
-    co2 = zeros(length(start_year:end_year), n_samples)           # Total atmospheric carbon dioxide concentrations (ppm).
-    ch4 = zeros(length(start_year:end_year), n_samples)           # Total atmospheric methane concentrations (ppb)
-    n2o = zeros(length(start_year:end_year), n_samples)           # Total atmospheric nitrous oxide concentrations (ppb).
-
-    # Load an instance of FAIR with user-specificed settings.
-    fair_raw = MimiFAIRv2.get_model(emissions_forcing_scenario=emissions_scenario, start_year=start_year, end_year=end_year)
-
-    # Create a model instance to speed things up.
-    fair = Mimi.build(fair_raw)
-
-    # Gather default emissions data
-    co2_default = deepcopy(fair[:co2_cycle, :E_co2])
-    n2o_default = deepcopy(fair[:n2o_cycle, :E_n2o])
-    ch4_default = deepcopy(fair[:ch4_cycle, :E_ch4])
-
     # Create a function to carry out the actual Monte Carlo analysis (passing in sampled constrained parameter values).
     # TODO type parameterize this so it's clear we need to input either nothing or a vector of vectors
     function fair_monte_carlo(  ;co2_em_vals::Union{Nothing, Vector{Vector{T1}}}  = nothing,
                                 n2o_em_vals::Union{Nothing, Vector{Vector{T2}}} = nothing,
                                 ch4_em_vals::Union{Nothing, Vector{Vector{T3}}} = nothing) where {T1, T2, T3}
 
-        for i = 1:n_samples
+        # Initialize an array to store FAIR temperature projections.
+        temperatures = zeros(length(start_year:end_year), n_samples)  # Global mean surface temperature anomaly (K)
+        rf = zeros(length(start_year:end_year), n_samples)            # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
+        co2 = zeros(length(start_year:end_year), n_samples)           # Total atmospheric carbon dioxide concentrations (ppm).
+        ch4 = zeros(length(start_year:end_year), n_samples)           # Total atmospheric methane concentrations (ppb)
+        n2o = zeros(length(start_year:end_year), n_samples)           # Total atmospheric nitrous oxide concentrations (ppb).
 
+        # Load an instance of FAIR with user-specificed settings.
+        fair_raw = MimiFAIRv2.get_model(emissions_forcing_scenario=emissions_scenario, start_year=start_year, end_year=end_year)
+
+        # Create a model instance to speed things up.
+        fair = Mimi.build(fair_raw)
+
+        for i = 1:n_samples
+            
             # ---- Emissions Trajectories ---- #
 
             # we need to make sure that the fair model has the default co2, n2o, and ch4 settings if none have been entered,
@@ -271,20 +266,14 @@ function create_fair_monte_carlo(n_samples::Int;
 
             if !(isnothing(co2_em_vals))
                 update_param!(fair, :co2_cycle, :E_co2, co2_em_vals[i])
-            else
-                update_param!(fair, :co2_cycle, :E_co2, co2_default)
             end
 
             if !(isnothing(n2o_em_vals))
                 update_param!(fair, :n2o_cycle, :E_n2o, n2o_em_vals[i])
-            else
-                update_param!(fair, :n2o_cycle, :E_n2o, n2o_default)
             end
             
             if !(isnothing(ch4_em_vals))
                 update_param!(fair, :ch4_cycle, :E_ch4, ch4_em_vals[i])
-            else
-                update_param!(fair, :ch4_cycle, :E_ch4, ch4_default)
             end
 
             # ---- Global Temperature Anomaly ---- #
