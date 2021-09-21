@@ -251,9 +251,9 @@ function create_fair_monte_carlo(n_samples::Int;
     fair = Mimi.build(fair_raw)
 
     # Gather default emissions data
-    co2_default = fair[:co2_cycle, :E_co2]
-    n2o_default = fair[:n2o_cycle, :E_n2o]
-    ch4_default = fair[:ch4_cycle, :E_ch4]
+    co2_default = deepcopy(fair[:co2_cycle, :E_co2])
+    n2o_default = deepcopy(fair[:n2o_cycle, :E_n2o])
+    ch4_default = deepcopy(fair[:ch4_cycle, :E_ch4])
 
     # Create a function to carry out the actual Monte Carlo analysis (passing in sampled constrained parameter values).
     # TODO type parameterize this so it's clear we need to input either nothing or a vector of vectors
