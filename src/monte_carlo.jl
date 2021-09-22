@@ -5,8 +5,11 @@
 #              Leach et al. (2021). The first function, "create_fair_monte_carlo" loads the constrained parameter
 #              samples from Leach et al. (2021) and cleans them up so they can be easily passed into Mimi-FAIRv2.0. It
 #              then creates a second function, "fair_monte_carlo" that performs the actual analysis. This function returns
-#              a dictionary with temperature, atmospheric co2, ch4, and n2o, and radiative forcing.  Adding other outputs
-#              is doable please add an Issue on Github if you would like this to be done.
+#              a dictionary with temperature, atmospheric co2, ch4, and n2o, and radiative forcing. Adding other outputs
+#              is doable please add an Issue on Github if you would like this to be done. This returned function can optionally take
+#              a vector of vectors to force co2, ch4, and n2o emissions trajectories for the `n_samples` runs, providing 
+#              these in the native MimiFAIRv2 emissions units, using optional arguments `co2_em_vals`, `ch4_em_vals`, and `n2o_em_vals` 
+#              respectively. 
 #
 #               The required constrained parameter files are uploaded to Zenodo with the citation Frank Errickson, 
 #               & Lisa Rennels. (2021). MimiFAIRV2 Large Data File Storage (0.1.0-DEV) [Data set]. Zenodo. 
@@ -21,10 +24,11 @@
 #       data_dir:           Location of the data files
 #       sample_id_subset:   IDs of the subset of samples to use from original constrained parameter values (each ID between 1 and 93,995 
 #                           inclusive). If this argument is set, it will be used instead of the step to create n random indices. The length 
-#                           must match n_samples.
+#                           should match n_samples, and if it is longer we will choose the first 1:n.
 #       delete_downloaded_data: Boolean (defaulting to false) to recursively delete all downloaded large data files of constrained parameters
 #                               at the end of the script.  Should be set to `false` if one will be running this several times and want to avoid 
 #                               re-downloading each time.
+#
 #----------------------------------------------------------------------------------------------------------------------
 
 # Load packages.
@@ -238,11 +242,29 @@ function create_fair_monte_carlo(n_samples::Int;
     thermal_decay_factors = exp.(-1.0 ./ Array(thermal_params[:,[:d1,:d2,:d3]]))
 
     # Create a function to carry out the actual Monte Carlo analysis (passing in sampled constrained parameter values).
-    # TODO type parameterize this so it's clear we need to input either nothing or a vector of vectors
     function fair_monte_carlo(  ;co2_em_vals::Union{Nothing, Vector{Vector{T1}}}  = nothing,
                                 n2o_em_vals::Union{Nothing, Vector{Vector{T2}}} = nothing,
                                 ch4_em_vals::Union{Nothing, Vector{Vector{T3}}} = nothing) where {T1, T2, T3}
 
+        # check dimensions
+        if !isnothing(co2_em_vals)
+            if length(co2_em_vals) !== n_samples || length(co2_em_vals[1]) !== (end_year - start_year + 1)
+                error("The provided co2_em_vals must be a vector with n_samples ($n_samples) elements, each of which is a vector spanning the full time of the model being run ($start_year to $end_year). Provided co2_em_vals has $(length(co2_em_vals)), with first element of length $(length(co2_em_vals[1]))")
+            end
+        end
+
+        if !isnothing(ch4_em_vals)
+            if length(ch4_em_vals) !== n_samples || length(ch4_em_vals[1]) !== (end_year - start_year + 1)
+                error("The provided ch4_em_vals must be a vector with n_samples ($n_samples) elements, each of which is a vector spanning the full time of the model being run ($start_year to $end_year). Provided co2_em_vals has $(length(ch4_em_vals)), with first element of length $(length(ch4_em_vals[1]))")
+            end
+        end
+
+        if !isnothing(n2o_em_vals)
+            if length(n2o_em_vals) !== n_samples || length(n2o_em_vals[1]) !== (end_year - start_year + 1)
+                error("The provided n2o_em_vals must be a vector with n_samples ($n_samples) elements, each of which is a vector spanning the full time of the model being run ($start_year to $end_year). Provided co2_em_vals has $(length(n2o_em_vals)), with first element of length $(length(n2o_em_vals[1]))")
+            end
+        end
+        
         # Initialize an array to store FAIR temperature projections.
         temperatures = zeros(length(start_year:end_year), n_samples)  # Global mean surface temperature anomaly (K)
         rf = zeros(length(start_year:end_year), n_samples)            # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
@@ -251,162 +273,157 @@ function create_fair_monte_carlo(n_samples::Int;
         n2o = zeros(length(start_year:end_year), n_samples)           # Total atmospheric nitrous oxide concentrations (ppb).
 
         # Load an instance of FAIR with user-specificed settings.
-        fair_raw = MimiFAIRv2.get_model(emissions_forcing_scenario=emissions_scenario, start_year=start_year, end_year=end_year)
+        fair_model = MimiFAIRv2.get_model(emissions_forcing_scenario=emissions_scenario, start_year=start_year, end_year=end_year)
 
         # Create a model instance to speed things up.
-        fair = Mimi.build(fair_raw)
+        fair_instance = Mimi.build(fair_model)
 
         for i = 1:n_samples
             
             # ---- Emissions Trajectories ---- #
-
-            # we need to make sure that the fair model has the default co2, n2o, and ch4 settings if none have been entered,
-            # in case a modified verison of fair is sitting around in the namespace, thus the calls to update_param! after 
-            # the else clause
-
             if !(isnothing(co2_em_vals))
-                update_param!(fair, :co2_cycle, :E_co2, co2_em_vals[i])
+                update_param!(fair_instance, :co2_cycle, :E_co2, co2_em_vals[i])
             end
 
             if !(isnothing(n2o_em_vals))
-                update_param!(fair, :n2o_cycle, :E_n2o, n2o_em_vals[i])
+                update_param!(fair_instance, :n2o_cycle, :E_n2o, n2o_em_vals[i])
             end
             
             if !(isnothing(ch4_em_vals))
-                update_param!(fair, :ch4_cycle, :E_ch4, ch4_em_vals[i])
+                update_param!(fair_instance, :ch4_cycle, :E_ch4, ch4_em_vals[i])
             end
 
             # ---- Global Temperature Anomaly ---- #
-            update_param!(fair, :temperature, :decay_factor, thermal_decay_factors[i,:])
-            update_param!(fair, :temperature, :q, Array(thermal_params[i,[:q1,:q2,:q3]]))
-            #update_param!(fair, :temperature, :Tj_0, vec(Array(init_thermal_vals[:,[:thermal_box_1,:thermal_box_2,:thermal_box_3]])))
-            #update_param!(fair, :temperature, :T_0, init_thermal_vals.global_temp_anomaly[1])
+            update_param!(fair_instance, :temperature, :decay_factor, thermal_decay_factors[i,:])
+            update_param!(fair_instance, :temperature, :q, Array(thermal_params[i,[:q1,:q2,:q3]]))
+            #update_param!(fair_instance, :temperature, :Tj_0, vec(Array(init_thermal_vals[:,[:thermal_box_1,:thermal_box_2,:thermal_box_3]])))
+            #update_param!(fair_instance, :temperature, :T_0, init_thermal_vals.global_temp_anomaly[1])
 
             # ---- Carbon Cycle ---- #
-            update_param!(fair, :co2_cycle, :r0_co2, co2_p.r0[i])
-            update_param!(fair, :co2_cycle, :rU_co2, co2_p.rC[i])
-            update_param!(fair, :co2_cycle, :rT_co2, co2_p.rT[i])
-            update_param!(fair, :co2_cycle, :rA_co2, co2_p.rA[i])
-            update_param!(fair, :co2_cycle, :g0_co2, g0_co2[i])
-            update_param!(fair, :co2_cycle, :g1_co2, g1_co2[i])
-            update_param!(fair, :co2_cycle, :a_co2,  co2_a[i,:])
-            update_param!(fair, :co2_cycle, :τ_co2,  co2_τ[i,:])
-            # update_param!(fair, :co2_cycle, :co2_0, co2_init.concentration[1])
-            # update_param!(fair, :co2_cycle, :GU_co2_0, co2_init.cumulative_uptake[1])
-            # update_param!(fair, :co2_cycle, :R0_co2, vec(Array(co2_init[:,[:pool1,:pool2,:pool3,:pool4]])))
+            update_param!(fair_instance, :co2_cycle, :r0_co2, co2_p.r0[i])
+            update_param!(fair_instance, :co2_cycle, :rU_co2, co2_p.rC[i])
+            update_param!(fair_instance, :co2_cycle, :rT_co2, co2_p.rT[i])
+            update_param!(fair_instance, :co2_cycle, :rA_co2, co2_p.rA[i])
+            update_param!(fair_instance, :co2_cycle, :g0_co2, g0_co2[i])
+            update_param!(fair_instance, :co2_cycle, :g1_co2, g1_co2[i])
+            update_param!(fair_instance, :co2_cycle, :a_co2,  co2_a[i,:])
+            update_param!(fair_instance, :co2_cycle, :τ_co2,  co2_τ[i,:])
+            # update_param!(fair_instance, :co2_cycle, :co2_0, co2_init.concentration[1])
+            # update_param!(fair_instance, :co2_cycle, :GU_co2_0, co2_init.cumulative_uptake[1])
+            # update_param!(fair_instance, :co2_cycle, :R0_co2, vec(Array(co2_init[:,[:pool1,:pool2,:pool3,:pool4]])))
 
             # ---- Methane Cycle ---- #
-            update_param!(fair, :ch4_cycle, :r0_ch4, ch4_p.r0[i])
-            update_param!(fair, :ch4_cycle, :rU_ch4, ch4_p.rC[i])
-            update_param!(fair, :ch4_cycle, :rT_ch4, ch4_p.rT[i])
-            update_param!(fair, :ch4_cycle, :rA_ch4, ch4_p.rA[i])
-            update_param!(fair, :ch4_cycle, :g0_ch4, g0_ch4[i])
-            update_param!(fair, :ch4_cycle, :g1_ch4, g1_ch4[i])
-            update_param!(fair, :ch4_cycle, :a_ch4,  ch4_a[i,:])
-            update_param!(fair, :ch4_cycle, :τ_ch4,  ch4_τ[i,:])
-            # update_param!(fair, :ch4_cycle, :ch4_0, ch4_init.concentration[1])
-            # update_param!(fair, :ch4_cycle, :GU_ch4_0, ch4_init.cumulative_uptake[1])
-            # update_param!(fair, :ch4_cycle, :R0_ch4, vec(Array(ch4_init[:,[:pool1,:pool2,:pool3,:pool4]])))
+            update_param!(fair_instance, :ch4_cycle, :r0_ch4, ch4_p.r0[i])
+            update_param!(fair_instance, :ch4_cycle, :rU_ch4, ch4_p.rC[i])
+            update_param!(fair_instance, :ch4_cycle, :rT_ch4, ch4_p.rT[i])
+            update_param!(fair_instance, :ch4_cycle, :rA_ch4, ch4_p.rA[i])
+            update_param!(fair_instance, :ch4_cycle, :g0_ch4, g0_ch4[i])
+            update_param!(fair_instance, :ch4_cycle, :g1_ch4, g1_ch4[i])
+            update_param!(fair_instance, :ch4_cycle, :a_ch4,  ch4_a[i,:])
+            update_param!(fair_instance, :ch4_cycle, :τ_ch4,  ch4_τ[i,:])
+            # update_param!(fair_instance, :ch4_cycle, :ch4_0, ch4_init.concentration[1])
+            # update_param!(fair_instance, :ch4_cycle, :GU_ch4_0, ch4_init.cumulative_uptake[1])
+            # update_param!(fair_instance, :ch4_cycle, :R0_ch4, vec(Array(ch4_init[:,[:pool1,:pool2,:pool3,:pool4]])))
 
             # ---- Nitrous Oxide Cycle ---- #
-            update_param!(fair, :n2o_cycle, :r0_n2o, n2o_p.r0[i])
-            update_param!(fair, :n2o_cycle, :rU_n2o, n2o_p.rC[i])
-            update_param!(fair, :n2o_cycle, :rT_n2o, n2o_p.rT[i])
-            update_param!(fair, :n2o_cycle, :rA_n2o, n2o_p.rA[i])
-            update_param!(fair, :n2o_cycle, :g0_n2o, g0_n2o[i])
-            update_param!(fair, :n2o_cycle, :g1_n2o, g1_n2o[i])
-            update_param!(fair, :n2o_cycle, :a_n2o,  n2o_a[i,:])
-            update_param!(fair, :n2o_cycle, :τ_n2o,  n2o_τ[i,:])
-            # update_param!(fair, :n2o_cycle, :n2o_0, n2o_init.concentration[1])
-            # update_param!(fair, :n2o_cycle, :GU_n2o_0, n2o_init.cumulative_uptake[1])
-            # update_param!(fair, :n2o_cycle, :R0_n2o, vec(Array(n2o_init[:,[:pool1,:pool2,:pool3,:pool4]])))
+            update_param!(fair_instance, :n2o_cycle, :r0_n2o, n2o_p.r0[i])
+            update_param!(fair_instance, :n2o_cycle, :rU_n2o, n2o_p.rC[i])
+            update_param!(fair_instance, :n2o_cycle, :rT_n2o, n2o_p.rT[i])
+            update_param!(fair_instance, :n2o_cycle, :rA_n2o, n2o_p.rA[i])
+            update_param!(fair_instance, :n2o_cycle, :g0_n2o, g0_n2o[i])
+            update_param!(fair_instance, :n2o_cycle, :g1_n2o, g1_n2o[i])
+            update_param!(fair_instance, :n2o_cycle, :a_n2o,  n2o_a[i,:])
+            update_param!(fair_instance, :n2o_cycle, :τ_n2o,  n2o_τ[i,:])
+            # update_param!(fair_instance, :n2o_cycle, :n2o_0, n2o_init.concentration[1])
+            # update_param!(fair_instance, :n2o_cycle, :GU_n2o_0, n2o_init.cumulative_uptake[1])
+            # update_param!(fair_instance, :n2o_cycle, :R0_n2o, vec(Array(n2o_init[:,[:pool1,:pool2,:pool3,:pool4]])))
 
             # ---- Flourinated Gas Cycles ---- #
-            update_param!(fair, :flourinated_cycles, :r0_flourinated, flourinated_r0[:,i])
-            update_param!(fair, :flourinated_cycles, :rU_flourinated, flourinated_rC[:,i])
-            update_param!(fair, :flourinated_cycles, :rT_flourinated, flourinated_rT[:,i])
-            update_param!(fair, :flourinated_cycles, :rA_flourinated, flourinated_rA[:,i])
-            update_param!(fair, :flourinated_cycles, :g0_flourinated, flourinated_g0[:,i])
-            update_param!(fair, :flourinated_cycles, :g1_flourinated, flourinated_g1[:,i])
-            update_param!(fair, :flourinated_cycles, :a_flourinated,  flourinated_a[:,:,i])
-            update_param!(fair, :flourinated_cycles, :τ_flourinated,  flourinated_τ[:,:,i])
-            # update_param!(fair, :flourinated_cycles, :flourinated_0, flourinated_init[:, :concentration])
-            # update_param!(fair, :flourinated_cycles, :GU_flourinated_0, flourinated_init[:, :cumulative_uptake])
-            # update_param!(fair, :flourinated_cycles, :R0_flourinated, Array(flourinated_init[:,[:pool1,:pool2,:pool3,:pool4]]))
+            update_param!(fair_instance, :flourinated_cycles, :r0_flourinated, flourinated_r0[:,i])
+            update_param!(fair_instance, :flourinated_cycles, :rU_flourinated, flourinated_rC[:,i])
+            update_param!(fair_instance, :flourinated_cycles, :rT_flourinated, flourinated_rT[:,i])
+            update_param!(fair_instance, :flourinated_cycles, :rA_flourinated, flourinated_rA[:,i])
+            update_param!(fair_instance, :flourinated_cycles, :g0_flourinated, flourinated_g0[:,i])
+            update_param!(fair_instance, :flourinated_cycles, :g1_flourinated, flourinated_g1[:,i])
+            update_param!(fair_instance, :flourinated_cycles, :a_flourinated,  flourinated_a[:,:,i])
+            update_param!(fair_instance, :flourinated_cycles, :τ_flourinated,  flourinated_τ[:,:,i])
+            # update_param!(fair_instance, :flourinated_cycles, :flourinated_0, flourinated_init[:, :concentration])
+            # update_param!(fair_instance, :flourinated_cycles, :GU_flourinated_0, flourinated_init[:, :cumulative_uptake])
+            # update_param!(fair_instance, :flourinated_cycles, :R0_flourinated, Array(flourinated_init[:,[:pool1,:pool2,:pool3,:pool4]]))
 
             # ---- Montreal Protocol Gas Cycles ---- #
-            update_param!(fair, :montreal_cycles, :r0_montreal, montreal_r0[:,i])
-            update_param!(fair, :montreal_cycles, :rU_montreal, montreal_rC[:,i])
-            update_param!(fair, :montreal_cycles, :rT_montreal, montreal_rT[:,i])
-            update_param!(fair, :montreal_cycles, :rA_montreal, montreal_rA[:,i])
-            update_param!(fair, :montreal_cycles, :g0_montreal, montreal_g0[:,i])
-            update_param!(fair, :montreal_cycles, :g1_montreal, montreal_g1[:,i])
-            update_param!(fair, :montreal_cycles, :a_montreal,  montreal_a[:,:,i])
-            update_param!(fair, :montreal_cycles, :τ_montreal,  montreal_τ[:,:,i])
-            # update_param!(fair, :montreal_cycles, :montreal_0, montreal_init[:, :concentration])
-            # update_param!(fair, :montreal_cycles, :GU_montreal_0, montreal_init[:, :cumulative_uptake])
-            # update_param!(fair, :montreal_cycles, :R0_montreal, Array(montreal_init[:,[:pool1,:pool2,:pool3,:pool4]]))
+            update_param!(fair_instance, :montreal_cycles, :r0_montreal, montreal_r0[:,i])
+            update_param!(fair_instance, :montreal_cycles, :rU_montreal, montreal_rC[:,i])
+            update_param!(fair_instance, :montreal_cycles, :rT_montreal, montreal_rT[:,i])
+            update_param!(fair_instance, :montreal_cycles, :rA_montreal, montreal_rA[:,i])
+            update_param!(fair_instance, :montreal_cycles, :g0_montreal, montreal_g0[:,i])
+            update_param!(fair_instance, :montreal_cycles, :g1_montreal, montreal_g1[:,i])
+            update_param!(fair_instance, :montreal_cycles, :a_montreal,  montreal_a[:,:,i])
+            update_param!(fair_instance, :montreal_cycles, :τ_montreal,  montreal_τ[:,:,i])
+            # update_param!(fair_instance, :montreal_cycles, :montreal_0, montreal_init[:, :concentration])
+            # update_param!(fair_instance, :montreal_cycles, :GU_montreal_0, montreal_init[:, :cumulative_uptake])
+            # update_param!(fair_instance, :montreal_cycles, :R0_montreal, Array(montreal_init[:,[:pool1,:pool2,:pool3,:pool4]]))
 
             # ---- Tropospheric Ozone Precursors, Aerosols, & Reactive Gas Cycles (Aerosol+) ---- #
-            update_param!(fair, :aerosol_plus_cycles, :r0_aerosol_plus, aerosol_plus_r0[:,i])
-            update_param!(fair, :aerosol_plus_cycles, :rU_aerosol_plus, aerosol_plus_rC[:,i])
-            update_param!(fair, :aerosol_plus_cycles, :rT_aerosol_plus, aerosol_plus_rT[:,i])
-            update_param!(fair, :aerosol_plus_cycles, :rA_aerosol_plus, aerosol_plus_rA[:,i])
-            update_param!(fair, :aerosol_plus_cycles, :g0_aerosol_plus, aerosol_plus_g0[:,i])
-            update_param!(fair, :aerosol_plus_cycles, :g1_aerosol_plus, aerosol_plus_g1[:,i])
-            update_param!(fair, :aerosol_plus_cycles, :a_aerosol_plus,  aerosol_plus_a[:,:,i])
-            update_param!(fair, :aerosol_plus_cycles, :τ_aerosol_plus,  aerosol_plus_τ[:,:,i])
-            # update_param!(fair, :aerosol_plus_cycles, :aerosol_plus_0, aerosol_plus_init[:, :concentration])
-            # update_param!(fair, :aerosol_plus_cycles, :GU_aerosol_plus_0, aerosol_plus_init[:, :cumulative_uptake])
-            # update_param!(fair, :aerosol_plus_cycles, :R0_aerosol_plus, Array(aerosol_plus_init[:,[:pool1,:pool2,:pool3,:pool4]]))
+            update_param!(fair_instance, :aerosol_plus_cycles, :r0_aerosol_plus, aerosol_plus_r0[:,i])
+            update_param!(fair_instance, :aerosol_plus_cycles, :rU_aerosol_plus, aerosol_plus_rC[:,i])
+            update_param!(fair_instance, :aerosol_plus_cycles, :rT_aerosol_plus, aerosol_plus_rT[:,i])
+            update_param!(fair_instance, :aerosol_plus_cycles, :rA_aerosol_plus, aerosol_plus_rA[:,i])
+            update_param!(fair_instance, :aerosol_plus_cycles, :g0_aerosol_plus, aerosol_plus_g0[:,i])
+            update_param!(fair_instance, :aerosol_plus_cycles, :g1_aerosol_plus, aerosol_plus_g1[:,i])
+            update_param!(fair_instance, :aerosol_plus_cycles, :a_aerosol_plus,  aerosol_plus_a[:,:,i])
+            update_param!(fair_instance, :aerosol_plus_cycles, :τ_aerosol_plus,  aerosol_plus_τ[:,:,i])
+            # update_param!(fair_instance, :aerosol_plus_cycles, :aerosol_plus_0, aerosol_plus_init[:, :concentration])
+            # update_param!(fair_instance, :aerosol_plus_cycles, :GU_aerosol_plus_0, aerosol_plus_init[:, :cumulative_uptake])
+            # update_param!(fair_instance, :aerosol_plus_cycles, :R0_aerosol_plus, Array(aerosol_plus_init[:,[:pool1,:pool2,:pool3,:pool4]]))
 
             # ---- Radiative Forcing ---- #
-            update_param!(fair, :radiative_forcing, :co2_f, co2_f[i,:])
-            update_param!(fair, :radiative_forcing, :ch4_f, ch4_f[i,:])
-            update_param!(fair, :radiative_forcing, :ch4_o3_f, ch4_o3_f[i,:])
-            update_param!(fair, :radiative_forcing, :ch4_h2o_f, ch4_h2o_f[i,:])
-            update_param!(fair, :radiative_forcing, :n2o_f, n2o_f[i,:])
-            update_param!(fair, :radiative_forcing, :n2o_o3_f, n2o_o3_f[i,:])
-            update_param!(fair, :radiative_forcing, :montreal_f, montreal_f[:,:,i])
-            update_param!(fair, :radiative_forcing, :montreal_ind_f, montreal_ind_f[:,:,i])
-            update_param!(fair, :radiative_forcing, :flourinated_f,flourinated_f[:,:,i])
-            update_param!(fair, :radiative_forcing, :bc_f, bc_f[i,:])
-            update_param!(fair, :radiative_forcing, :bc_snow_f, bc_snow_f[i,:])
-            update_param!(fair, :radiative_forcing, :bc_aci_f, bc_aci_f[i,:])
-            update_param!(fair, :radiative_forcing, :co_f, co_f[i,:])
-            update_param!(fair, :radiative_forcing, :co_o3_f, co_o3_f[i,:])
-            update_param!(fair, :radiative_forcing, :nh3_f, nh3_f[i,:])
-            update_param!(fair, :radiative_forcing, :nmvoc_f, nmvoc_f[i,:])
-            update_param!(fair, :radiative_forcing, :nmvoc_o3_f, nmvoc_o3_f[i,:])
-            update_param!(fair, :radiative_forcing, :nox_f, nox_f[i,:])
-            update_param!(fair, :radiative_forcing, :nox_o3_f, nox_o3_f[i,:])
-            update_param!(fair, :radiative_forcing, :nox_avi_f, nox_avi_f[i,:])
-            update_param!(fair, :radiative_forcing, :nox_avi_contrails_f, nox_avi_contrails_f[i,:])
-            update_param!(fair, :radiative_forcing, :oc_f, oc_f[i,:])
-            update_param!(fair, :radiative_forcing, :oc_aci_f, oc_aci_f[i,:])
-            update_param!(fair, :radiative_forcing, :so2_f, so2_f[i,:])
-            update_param!(fair, :radiative_forcing, :so2_aci_f, so2_aci_f[i,:])
-            update_param!(fair, :radiative_forcing, :solar_f, exogenous_forcing_params[i, :solar])
-            update_param!(fair, :radiative_forcing, :landuse_f, exogenous_forcing_params[i, :land_use])
-            update_param!(fair, :radiative_forcing, :volcanic_f, exogenous_forcing_params[i, :volcanic])
+            update_param!(fair_instance, :radiative_forcing, :co2_f, co2_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :ch4_f, ch4_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :ch4_o3_f, ch4_o3_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :ch4_h2o_f, ch4_h2o_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :n2o_f, n2o_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :n2o_o3_f, n2o_o3_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :montreal_f, montreal_f[:,:,i])
+            update_param!(fair_instance, :radiative_forcing, :montreal_ind_f, montreal_ind_f[:,:,i])
+            update_param!(fair_instance, :radiative_forcing, :flourinated_f,flourinated_f[:,:,i])
+            update_param!(fair_instance, :radiative_forcing, :bc_f, bc_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :bc_snow_f, bc_snow_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :bc_aci_f, bc_aci_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :co_f, co_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :co_o3_f, co_o3_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :nh3_f, nh3_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :nmvoc_f, nmvoc_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :nmvoc_o3_f, nmvoc_o3_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :nox_f, nox_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :nox_o3_f, nox_o3_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :nox_avi_f, nox_avi_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :nox_avi_contrails_f, nox_avi_contrails_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :oc_f, oc_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :oc_aci_f, oc_aci_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :so2_f, so2_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :so2_aci_f, so2_aci_f[i,:])
+            update_param!(fair_instance, :radiative_forcing, :solar_f, exogenous_forcing_params[i, :solar])
+            update_param!(fair_instance, :radiative_forcing, :landuse_f, exogenous_forcing_params[i, :land_use])
+            update_param!(fair_instance, :radiative_forcing, :volcanic_f, exogenous_forcing_params[i, :volcanic])
 
             # --- Set Parameters Common to Multiple Components ---- #
-            update_param!(fair, :shared_co2_pi, co2_p[i, :PI_conc])
-            update_param!(fair, :shared_ch4_pi, ch4_p[i, :PI_conc])
-            update_param!(fair, :shared_n2o_pi, n2o_p[i, :PI_conc])
-            update_param!(fair, :shared_montreal_pi, montreal_pi_conc[:,i])
-            update_param!(fair, :shared_flourinated_pi, flourinated_pi_conc[:,i])
-            update_param!(fair, :shared_aerosol_plus_pi, aerosol_plus_pi_conc[:,i])
+            update_param!(fair_instance, :shared_co2_pi, co2_p[i, :PI_conc])
+            update_param!(fair_instance, :shared_ch4_pi, ch4_p[i, :PI_conc])
+            update_param!(fair_instance, :shared_n2o_pi, n2o_p[i, :PI_conc])
+            update_param!(fair_instance, :shared_montreal_pi, montreal_pi_conc[:,i])
+            update_param!(fair_instance, :shared_flourinated_pi, flourinated_pi_conc[:,i])
+            update_param!(fair_instance, :shared_aerosol_plus_pi, aerosol_plus_pi_conc[:,i])
 
             # Run model.
-            run(fair)
+            run(fair_instance)
 
             # Store projections.
-            temperatures[:,i] = fair[:temperature, :T] # Global mean surface temperature anomaly (K)
-            rf[:, i] = fair[:radiative_forcing, :total_RF] # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
-            co2[:, i] = fair[:co2_cycle, :co2]  # Total atmospheric carbon dioxide concentrations (ppm).
-            ch4[:, i] = fair[:ch4_cycle, :ch4]  # Total atmospheric methane concentrations (ppb)
-            n2o[:, i] = fair[:n2o_cycle, :n2o]  # Total atmospheric nitrous oxide concentrations (ppb)
+            temperatures[:,i] = fair_instance[:temperature, :T] # Global mean surface temperature anomaly (K)
+            rf[:, i] = fair_instance[:radiative_forcing, :total_RF] # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
+            co2[:, i] = fair_instance[:co2_cycle, :co2]  # Total atmospheric carbon dioxide concentrations (ppm).
+            ch4[:, i] = fair_instance[:ch4_cycle, :ch4]  # Total atmospheric methane concentrations (ppb)
+            n2o[:, i] = fair_instance[:n2o_cycle, :n2o]  # Total atmospheric nitrous oxide concentrations (ppb)
 
         end
 
