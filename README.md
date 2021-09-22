@@ -97,7 +97,7 @@ Calling `create_fair_monte_carlo` as follows:
 my_fair_monte_carlo = create_fair_monte_carlo(1_000)
 ```
 
-will return another function, in this case named `my_fair_monte_carlo`, that performs the actual analysis. This function returns a dictionary with keys temperature, atmospheric co2, ch4, and n2o, and radiative forcing. Adding other outputs is doable please add an Issue on Github if you would like this to be done. This returned function can optionally take a vector of vectors to force co2, ch4, and n2o emissions trajectories for the `n_samples` runs, providing these in the native MimiFAIRv2 emissions units, using optional arguments `co2_em_vals`, `ch4_em_vals`, and `n2o_em_vals` respectively. 
+will return another function, in this case named `my_fair_monte_carlo`, that performs the actual analysis. This function returns a dictionary with temperature, atmospheric co2, ch4, and n2o, and radiative forcing. Adding other outputs is doable please add an Issue on Github if you would like this to be done. This returned function can optionally take a vector of vectors to force co2, ch4, and n2o emissions trajectories for the `n_samples` runs, providing these in the native MimiFAIRv2 emissions units, using optional arguments `co2_em_vals`, `ch4_em_vals`, and `n2o_em_vals` respectively. 
 
 ```julia
 function fair_monte_carlo( ; 
