@@ -27,7 +27,7 @@ Return a constructed model with default settings for emissions forcing scenario
 transient climate response (default to 1.79), realized warming fraction (default 
 to 5.22), and forcing from a doubling of CO₂ (default to 3.759).
 """
-function get_model(;emissions_forcing_scenario::String="ssp585", start_year::Int=1750, end_year::Int=2500, TCR::Float64=1.79, RWF::Float64=0.552, F2x::Float64=3.759)
+function get_model(;emissions_forcing_scenario::String="ssp585", start_year::Int=1750, end_year::Int=2500, TCR::Float64=1.79, RWF::Float64=0.552, F2x::Float64=3.759, param_type::String="nothing")
 
     if start_year !== 1750
         error("FAIRv2 model monte carlo simulation should not be set to start with a year differing from 1750 as initial conditions are not calibrated for a different start year!")
@@ -133,7 +133,13 @@ function get_model(;emissions_forcing_scenario::String="ssp585", start_year::Int
  	# ---------------------------------------------
 
  	# Create a Mimi model.
-    m = Model()
+ 	if param_type=="nothing"
+ 		m = Model()
+ 	elseif param_type=="Number"
+ 		m = Model(Number)
+ 	else
+ 		error("You are attempting to initialise a model with in invalid parameter type")
+ 	end
 
     # Set time and gas-grouping indices.
     set_dimension!(m, :time, start_year:end_year)
