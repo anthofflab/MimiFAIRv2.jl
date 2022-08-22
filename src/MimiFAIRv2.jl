@@ -30,7 +30,7 @@ to 5.22), and forcing from a doubling of CO₂ (default to 3.759).
 function get_model(;emissions_forcing_scenario::String="ssp585", start_year::Int=1750, end_year::Int=2500, TCR::Float64=1.79, RWF::Float64=0.552, F2x::Float64=3.759, param_type::String="nothing")
 
     if start_year !== 1750
-        error("FAIRv2 model monte carlo simulation should not be set to start with a year differing from 1750 as initial conditions are not calibrated for a different start year!")
+        @warn("FAIRv2 model monte carlo simulation should not be set to start with a year differing from 1750 as initial conditions are not calibrated for a different start year!")
     end 
 
  	# ---------------------------------------------
