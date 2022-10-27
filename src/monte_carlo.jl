@@ -90,10 +90,10 @@ function create_fair_monte_carlo(n_samples::Int;
     end
 
     # Subset constrained parameters using random sample id values.
-    thermal_params           = thermal_params[findall((in)(sample_id_subset), thermal_params.sample_id), :]
-    gas_params               = gas_params[findall((in)(sample_id_subset), gas_params.sample_id), :]
-    indirect_forcing_params  = indirect_forcing_params[findall((in)(sample_id_subset), indirect_forcing_params.sample_id), :]
-    exogenous_forcing_params = exogenous_forcing_params[findall((in)(sample_id_subset), exogenous_forcing_params.sample_id), :]
+    thermal_params           = thermal_params[indexin(sample_id_subset, thermal_params.sample_id), :]
+    gas_params               = gas_params[indexin(sample_id_subset, gas_params.sample_id), :]
+    indirect_forcing_params  = indirect_forcing_params[indexin(sample_id_subset, indirect_forcing_params.sample_id), :]
+    exogenous_forcing_params = exogenous_forcing_params[indexin(sample_id_subset, exogenous_forcing_params.sample_id), :]
 
     # Isolate individual and group gas parameters for convenience.
     co2_p = filter(:gas_name  => ==("carbon_dioxide"), gas_params)
@@ -178,32 +178,32 @@ function create_fair_monte_carlo(n_samples::Int;
     # Loop through constrained parameter samples and reshape into arrays that can be passed into Mimi-FAIRv2.0
     for i = 1:n_samples
         # Montreal gases.
-        montreal_a[:,:,i]         .= montreal_gas_p[findall(x->x==sample_id_subset[i], montreal_gas_p.sample_id), [:a1,:a2,:a3,:a4]]
-        montreal_τ[:,:,i]         .= montreal_gas_p[findall(x->x==sample_id_subset[i], montreal_gas_p.sample_id), [:tau1,:tau2,:tau3,:tau4]]
-        montreal_f[:,:,i]         .= montreal_gas_p[findall(x->x==sample_id_subset[i], montreal_gas_p.sample_id), [:f1,:f2,:f3]]
-        montreal_ind_f[:,:,i]     .= montreal_indirect[findall(x->x==sample_id_subset[i], montreal_indirect.sample_id), [:f1,:f2,:f3]]
-        montreal_r0[:,i]          .= montreal_gas_p[findall(x->x==sample_id_subset[i], montreal_gas_p.sample_id), :r0]
-        montreal_rC[:,i]          .= montreal_gas_p[findall(x->x==sample_id_subset[i], montreal_gas_p.sample_id), :rC]
-        montreal_rT[:,i]          .= montreal_gas_p[findall(x->x==sample_id_subset[i], montreal_gas_p.sample_id), :rT]
-        montreal_rA[:,i]          .= montreal_gas_p[findall(x->x==sample_id_subset[i], montreal_gas_p.sample_id), :rA]
-        montreal_pi_conc[:,i]     .= montreal_gas_p[findall(x->x==sample_id_subset[i], montreal_gas_p.sample_id), :PI_conc]
+        montreal_a[:,:,i]         .= montreal_gas_p[indexin(sample_id_subset[i], montreal_gas_p.sample_id), [:a1,:a2,:a3,:a4]]
+        montreal_τ[:,:,i]         .= montreal_gas_p[indexin(sample_id_subset[i], montreal_gas_p.sample_id), [:tau1,:tau2,:tau3,:tau4]]
+        montreal_f[:,:,i]         .= montreal_gas_p[indexin(sample_id_subset[i], montreal_gas_p.sample_id), [:f1,:f2,:f3]]
+        montreal_ind_f[:,:,i]     .= montreal_indirect[indexin(sample_id_subset[i], montreal_indirect.sample_id), [:f1,:f2,:f3]]
+        montreal_r0[:,i]          .= montreal_gas_p[indexin(sample_id_subset[i], montreal_gas_p.sample_id), :r0]
+        montreal_rC[:,i]          .= montreal_gas_p[indexin(sample_id_subset[i], montreal_gas_p.sample_id), :rC]
+        montreal_rT[:,i]          .= montreal_gas_p[indexin(sample_id_subset[i], montreal_gas_p.sample_id), :rT]
+        montreal_rA[:,i]          .= montreal_gas_p[indexin(sample_id_subset[i], montreal_gas_p.sample_id), :rA]
+        montreal_pi_conc[:,i]     .= montreal_gas_p[indexin(sample_id_subset[i], montreal_gas_p.sample_id), :PI_conc]
         # Flourinated gases.
-        flourinated_a[:,:,i]      .= flourinated_gas_p[findall(x->x==sample_id_subset[i], flourinated_gas_p.sample_id), [:a1,:a2,:a3,:a4]]
-        flourinated_τ[:,:,i]      .= flourinated_gas_p[findall(x->x==sample_id_subset[i], flourinated_gas_p.sample_id), [:tau1,:tau2,:tau3,:tau4]]
-        flourinated_f[:,:,i]      .= flourinated_gas_p[findall(x->x==sample_id_subset[i], flourinated_gas_p.sample_id), [:f1,:f2,:f3]]
-        flourinated_r0[:,i]       .= flourinated_gas_p[findall(x->x==sample_id_subset[i], flourinated_gas_p.sample_id), :r0]
-        flourinated_rC[:,i]       .= flourinated_gas_p[findall(x->x==sample_id_subset[i], flourinated_gas_p.sample_id), :rC]
-        flourinated_rT[:,i]       .= flourinated_gas_p[findall(x->x==sample_id_subset[i], flourinated_gas_p.sample_id), :rT]
-        flourinated_rA[:,i]       .= flourinated_gas_p[findall(x->x==sample_id_subset[i], flourinated_gas_p.sample_id), :rA]
-        flourinated_pi_conc[:,i]  .= flourinated_gas_p[findall(x->x==sample_id_subset[i], flourinated_gas_p.sample_id), :PI_conc]
+        flourinated_a[:,:,i]      .= flourinated_gas_p[indexin(sample_id_subset[i], flourinated_gas_p.sample_id), [:a1,:a2,:a3,:a4]]
+        flourinated_τ[:,:,i]      .= flourinated_gas_p[indexin(sample_id_subset[i], flourinated_gas_p.sample_id), [:tau1,:tau2,:tau3,:tau4]]
+        flourinated_f[:,:,i]      .= flourinated_gas_p[indexin(sample_id_subset[i], flourinated_gas_p.sample_id), [:f1,:f2,:f3]]
+        flourinated_r0[:,i]       .= flourinated_gas_p[indexin(sample_id_subset[i], flourinated_gas_p.sample_id), :r0]
+        flourinated_rC[:,i]       .= flourinated_gas_p[indexin(sample_id_subset[i], flourinated_gas_p.sample_id), :rC]
+        flourinated_rT[:,i]       .= flourinated_gas_p[indexin(sample_id_subset[i], flourinated_gas_p.sample_id), :rT]
+        flourinated_rA[:,i]       .= flourinated_gas_p[indexin(sample_id_subset[i], flourinated_gas_p.sample_id), :rA]
+        flourinated_pi_conc[:,i]  .= flourinated_gas_p[indexin(sample_id_subset[i], flourinated_gas_p.sample_id), :PI_conc]
         # Aerosol+ gases.
-        aerosol_plus_a[:,:,i]     .= aerosol_plus_gas_p[findall(x->x==sample_id_subset[i], aerosol_plus_gas_p.sample_id), [:a1,:a2,:a3,:a4]]
-        aerosol_plus_τ[:,:,i]     .= aerosol_plus_gas_p[findall(x->x==sample_id_subset[i], aerosol_plus_gas_p.sample_id), [:tau1,:tau2,:tau3,:tau4]]
-        aerosol_plus_r0[:,i]      .= aerosol_plus_gas_p[findall(x->x==sample_id_subset[i], aerosol_plus_gas_p.sample_id), :r0]
-        aerosol_plus_rC[:,i]      .= aerosol_plus_gas_p[findall(x->x==sample_id_subset[i], aerosol_plus_gas_p.sample_id), :rC]
-        aerosol_plus_rT[:,i]      .= aerosol_plus_gas_p[findall(x->x==sample_id_subset[i], aerosol_plus_gas_p.sample_id), :rT]
-        aerosol_plus_rA[:,i]      .= aerosol_plus_gas_p[findall(x->x==sample_id_subset[i], aerosol_plus_gas_p.sample_id), :rA]
-        aerosol_plus_pi_conc[:,i] .= aerosol_plus_gas_p[findall(x->x==sample_id_subset[i], aerosol_plus_gas_p.sample_id), :PI_conc]
+        aerosol_plus_a[:,:,i]     .= aerosol_plus_gas_p[indexin(sample_id_subset[i], aerosol_plus_gas_p.sample_id), [:a1,:a2,:a3,:a4]]
+        aerosol_plus_τ[:,:,i]     .= aerosol_plus_gas_p[indexin(sample_id_subset[i], aerosol_plus_gas_p.sample_id), [:tau1,:tau2,:tau3,:tau4]]
+        aerosol_plus_r0[:,i]      .= aerosol_plus_gas_p[indexin(sample_id_subset[i], aerosol_plus_gas_p.sample_id), :r0]
+        aerosol_plus_rC[:,i]      .= aerosol_plus_gas_p[indexin(sample_id_subset[i], aerosol_plus_gas_p.sample_id), :rC]
+        aerosol_plus_rT[:,i]      .= aerosol_plus_gas_p[indexin(sample_id_subset[i], aerosol_plus_gas_p.sample_id), :rT]
+        aerosol_plus_rA[:,i]      .= aerosol_plus_gas_p[indexin(sample_id_subset[i], aerosol_plus_gas_p.sample_id), :rA]
+        aerosol_plus_pi_conc[:,i] .= aerosol_plus_gas_p[indexin(sample_id_subset[i], aerosol_plus_gas_p.sample_id), :PI_conc]
         # Aerosol+ forcing parameters.
         bc_f[i,:]                 = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "bc") .& (aerosol_plus_gas_p.sample_id .== sample_id_subset[i]), [:f1,:f2,:f3]])
         bc_snow_f[i,:]            = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "bc|bc_on_snow") .& (indirect_forcing_params.sample_id .== sample_id_subset[i]), [:f1,:f2,:f3]])
