@@ -7,57 +7,73 @@
 #              then creates a second function, "fair_monte_carlo" that performs the actual analysis. This function returns
 #              a dictionary with temperature, atmospheric co2, ch4, and n2o, and radiative forcing. Adding other outputs
 #              is doable please add an Issue on Github if you would like this to be done. This returned function can optionally take
-#              a vector of vectors to force co2, ch4, and n2o emissions trajectories for the `n_samples` runs, providing 
-#              these in the native MimiFAIRv2 emissions units, using optional arguments `co2_em_vals`, `ch4_em_vals`, and `n2o_em_vals` 
-#              respectively. 
+#              a vector of vectors to force co2, ch4, and n2o emissions trajectories for the `n_samples` runs, providing
+#              these in the native MimiFAIRv2 emissions units, using optional arguments `co2_em_vals`, `ch4_em_vals`, and `n2o_em_vals`
+#              respectively.
 #
-#               The required constrained parameter files are uploaded to Zenodo with the citation Frank Errickson, 
-#               & Lisa Rennels. (2021). MimiFAIRV2 Large Data File Storage (0.1.0-DEV) [Data set]. Zenodo. 
+#               The required constrained parameter files are uploaded to Zenodo with the citation Frank Errickson,
+#               & Lisa Rennels. (2021). MimiFAIRV2 Large Data File Storage (0.1.0-DEV) [Data set]. Zenodo.
 #               https://doi.org/10.5281/zenodo.5513221
 #
 # Function Arguments:
 #
 #       n_samples:          Number of samples to randomly draw from original constrained parameter values (max = 93,995).
-#       emissions_scenario: Current options are: "ssp119", "ssp126", "ssp245", "ssp370", "ssp585"
 #       start_year:         First year to run the model (note, Mimi-FAIR requires user-supplied initial conditions if not starting in 1750 so this is not yet supported for a year other than 1750).
 #       end_year:           Final year to run the model.
 #       data_dir:           Location of the data files
-#       sample_id_subset:   IDs of the subset of samples to use from original constrained parameter values (each ID between 1 and 93,995 
-#                           inclusive). If this argument is set, it will be used instead of the step to create n random indices. The length 
+#       sample_id_subset:   IDs of the subset of samples to use from original constrained parameter values (each ID between 1 and 93,995
+#                           inclusive). If this argument is set, it will be used instead of the step to create n random indices. The length
 #                           should match n_samples, and if it is longer we will choose the first 1:n.
 #       delete_downloaded_data: Boolean (defaulting to false) to recursively delete all downloaded large data files of constrained parameters
-#                               at the end of the script.  Should be set to `false` if one will be running this several times and want to avoid 
+#                               at the end of the script.  Should be set to `false` if one will be running this several times and want to avoid
 #                               re-downloading each time.
 #
 #----------------------------------------------------------------------------------------------------------------------
 
 # Load packages.
-using CSVFiles, DataFrames, Mimi, MimiFAIRv2, StatsBase, Downloads
+using CSVFiles, DataFrames, Mimi, MimiFAIRv2, StatsBase, Downloads, ProgressMeter
+import Mimi.MarginalInstance
 
+function create_fair_monte_carlo(n_samples::Int;
+                                 emissions_scenario::String="ssp585",
+                                 start_year::Int=1750,
+                                 end_year::Int=2300,
+                                 data_dir::String = joinpath(@__DIR__, "..", "data", "large_constrained_parameter_files"),
+                                 sample_id_subset::Union{Vector, Nothing} = nothing,
+                                 delete_downloaded_data::Bool = true
+                                 )
 
-function create_fair_monte_carlo(n_samples::Int; 
-                                emissions_scenario::String="ssp585", 
-                                start_year::Int=1750, 
-                                end_year::Int=2300, 
-                                data_dir::String = joinpath(@__DIR__, "..", "data", "large_constrained_parameter_files"),
-                                sample_id_subset::Union{Vector, Nothing} = nothing,
-                                delete_downloaded_data::Bool = true
-                                )
+    # Load an instance of FAIR with user-specificed settings.
+    fair_model = MimiFAIRv2.get_model(emissions_forcing_scenario=emissions_scenario, start_year=start_year, end_year=end_year)
+
+    create_fair_monte_carlo(fair_model, n_samples; start_year=start_year, end_year=end_year, data_dir=data_dir,
+                            sample_id_subset=sample_id_subset, delete_downloaded_data=delete_downloaded_data)
+end
+
+function create_fair_monte_carlo(fair_model::Union{Model, MarginalModel}, n_samples::Int;
+                                 start_year::Int=1750,
+                                 end_year::Int=2300,
+                                 data_dir::String = joinpath(@__DIR__, "..", "data", "large_constrained_parameter_files"),
+                                 sample_id_subset::Union{Vector, Nothing} = nothing,
+                                 delete_downloaded_data::Bool = true,
+                                 other_mc_set::Function = ((model, ii) -> nothing),
+                                 other_mc_get::Function = (model -> nothing)
+                                 )
 
     if start_year !== 1750
         error("FAIRv2 model monte carlo simulation should not be set to start with a year differing from 1750 as initial conditions are not calibrated for a different start year!")
-    end 
-                            
-    # Load constrained FAIR parameters from Leach et al. (2021) 
-    
+    end
+
+    # Load constrained FAIR parameters from Leach et al. (2021)
+
     # Full files are pulled down via zenodo links to a local directory if they do
     # not already exist in the repository relative path
     isdir(data_dir) || mkpath(data_dir)
     _download_paths = Dict(
-                :julia_constrained_thermal_parameters_average_probs => "https://zenodo.org/record/5513221/files/julia_constrained_thermal_parameters_average_probs.csv?download=1", 
+                :julia_constrained_thermal_parameters_average_probs => "https://zenodo.org/record/5513221/files/julia_constrained_thermal_parameters_average_probs.csv?download=1",
                 :julia_constrained_gas_cycle_parameters_average_probs => "https://zenodo.org/record/5513221/files/julia_constrained_gas_cycle_parameters_average_probs.csv?download=1",
-                :julia_constrained_indirect_forcing_parameters_average_probs => "https://zenodo.org/record/5513221/files/julia_constrained_indirect_forcing_parameters_average_probs.csv?download=1", 
-                :julia_constrained_exogenous_forcing_parameters_average_probs => "https://zenodo.org/record/5513221/files/julia_constrained_exogenous_forcing_parameters_average_probs.csv?download=1", 
+                :julia_constrained_indirect_forcing_parameters_average_probs => "https://zenodo.org/record/5513221/files/julia_constrained_indirect_forcing_parameters_average_probs.csv?download=1",
+                :julia_constrained_exogenous_forcing_parameters_average_probs => "https://zenodo.org/record/5513221/files/julia_constrained_exogenous_forcing_parameters_average_probs.csv?download=1",
     )
 
     for (k, v) in _download_paths
@@ -77,7 +93,7 @@ function create_fair_monte_carlo(n_samples::Int;
     # Create random indices and create a subset of FAIR sample id values (for indexing data) if they were not provided directly by the user with the
     # optional sample_id_subset parameter.
     if isnothing(sample_id_subset)
-        rand_indices     = sort(sample(1:93995, n_samples, replace=false)) 
+        rand_indices     = sort(sample(1:93995, n_samples, replace=false))
         sample_id_subset = thermal_params[rand_indices, :sample_id]
     # Do some checks on the provided sample id subset
     else
@@ -264,7 +280,7 @@ function create_fair_monte_carlo(n_samples::Int;
                 error("The provided n2o_em_vals must be a vector with n_samples ($n_samples) elements, each of which is a vector spanning the full time of the model being run ($start_year to $end_year). Provided co2_em_vals has $(length(n2o_em_vals)), with first element of length $(length(n2o_em_vals[1]))")
             end
         end
-        
+
         # Initialize an array to store FAIR temperature projections.
         temperatures = zeros(length(start_year:end_year), n_samples)  # Global mean surface temperature anomaly (K)
         rf = zeros(length(start_year:end_year), n_samples)            # Total radiative forcing, with individual components scaled by their respective efficacy (Wm⁻²)
@@ -272,14 +288,14 @@ function create_fair_monte_carlo(n_samples::Int;
         ch4 = zeros(length(start_year:end_year), n_samples)           # Total atmospheric methane concentrations (ppb)
         n2o = zeros(length(start_year:end_year), n_samples)           # Total atmospheric nitrous oxide concentrations (ppb).
 
-        # Load an instance of FAIR with user-specificed settings.
-        fair_model = MimiFAIRv2.get_model(emissions_forcing_scenario=emissions_scenario, start_year=start_year, end_year=end_year)
-
         # Create a model instance to speed things up.
         fair_instance = Mimi.build(fair_model)
 
+        progress = Progress(n_samples, 1)
+
+        otherresults = []
         for i = 1:n_samples
-            
+
             # ---- Emissions Trajectories ---- #
             if !(isnothing(co2_em_vals))
                 update_param!(fair_instance, :co2_cycle, :E_co2, co2_em_vals[i])
@@ -288,7 +304,7 @@ function create_fair_monte_carlo(n_samples::Int;
             if !(isnothing(n2o_em_vals))
                 update_param!(fair_instance, :n2o_cycle, :E_n2o, n2o_em_vals[i])
             end
-            
+
             if !(isnothing(ch4_em_vals))
                 update_param!(fair_instance, :ch4_cycle, :E_ch4, ch4_em_vals[i])
             end
@@ -415,6 +431,9 @@ function create_fair_monte_carlo(n_samples::Int;
             update_param!(fair_instance, :shared_flourinated_pi, flourinated_pi_conc[:,i])
             update_param!(fair_instance, :shared_aerosol_plus_pi, aerosol_plus_pi_conc[:,i])
 
+            # Any other parameter setting
+            other_mc_set(fair_instance, i)
+
             # Run model.
             run(fair_instance)
 
@@ -425,11 +444,14 @@ function create_fair_monte_carlo(n_samples::Int;
             ch4[:, i] = fair_instance[:ch4_cycle, :ch4]  # Total atmospheric methane concentrations (ppb)
             n2o[:, i] = fair_instance[:n2o_cycle, :n2o]  # Total atmospheric nitrous oxide concentrations (ppb)
 
+            othermc = other_mc_get(fair_instance)
+            push!(otherresults, othermc)
+            next!(progress)
         end
 
-        # Return temperature and radiative forcing 
-        return Dict(:temperatures => temperatures, :rf => rf, :co2 => co2, :ch4 => ch4, :n2o => n2o)
-        
+        # Return temperature and radiative forcing
+        return Dict(:temperatures => temperatures, :rf => rf, :co2 => co2, :ch4 => ch4, :n2o => n2o, :other => otherresults)
+
     end
 
     # Recursively delete the constrained files downloaded
