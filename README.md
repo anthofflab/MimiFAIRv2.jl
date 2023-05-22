@@ -106,5 +106,5 @@ function fair_monte_carlo( ;
 Function Arguments: 
 
 - co2_em_vals: A vector with n_samples elements, each of which is a vector spanning the full time of the model being run and holding an exogenous stream of co2 emissions in the native FAIRv2 units, GtC (convert to GtCO2 with multiplier 44/12)
-- n2o_em_vals: A vector with n_samples elements, each of which is a vector spanning the full time of the model being run and holding an exogenous stream of n2o emissions in the native FAIRv2 units, GtN (convert to GtN2O with multiplier 44/28)
-- ch4_em_vals: A vector with n_samples elements, each of which is a vector spanning the full time of the model being run and holding an exogenous stream of ch4 emissions in the native FAIRv2 units, GtCH4.
+- n2o_em_vals: A vector with n_samples elements, each of which is a vector spanning the full time of the model being run and holding an exogenous stream of n2o emissions in the native FAIRv2 units, MtN (convert to MtN2O with multiplier 44/28)
+- ch4_em_vals: A vector with n_samples elements, each of which is a vector spanning the full time of the model being run and holding an exogenous stream of ch4 emissions in the native FAIRv2 units, MtCH4.
