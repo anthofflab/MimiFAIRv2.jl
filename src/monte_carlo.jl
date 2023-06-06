@@ -32,7 +32,7 @@
 #----------------------------------------------------------------------------------------------------------------------
 
 # Load packages.
-using CSVFiles, DataFrames, Mimi, MimiFAIRv2, StatsBase, Downloads
+using CSVFiles, DataFrames, Mimi, MimiFAIRv2, StatsBase, Downloads, Query
 
 
 function create_fair_monte_carlo(n_samples::Int; 
@@ -174,80 +174,66 @@ function create_fair_monte_carlo(n_samples::Int;
     so2_aci_f           = zeros(n_samples, 3)
 
     # Loop through constrained parameter samples and reshape into arrays that can be passed into Mimi-FAIRv2.0
+
+    # To improve performance find indices once. Use a NamedTuple with keys of the
+    # different gas DataFrames and Values which are vectors of BitVectors that can
+    # be used for indexing
+    indices = (
+                montreal_gas_p_rows = [montreal_gas_p.sample_id .== sample_id for sample_id in sample_id_subset],
+                montreal_indirect_rows = [montreal_indirect.sample_id .== sample_id for sample_id in sample_id_subset],
+                flourinated_gas_p_rows = [flourinated_gas_p.sample_id .== sample_id for sample_id in sample_id_subset],
+                aerosol_plus_gas_p_rows = [aerosol_plus_gas_p.sample_id .== sample_id for sample_id in sample_id_subset],
+                indirect_forcing_rows = [indirect_forcing_params.sample_id .== sample_id for sample_id in sample_id_subset]
+            )
     for i = 1:n_samples
 
         #Montreal gases
-        montreal_gas_p_rows = findall(x->x==sample_id_subset[i], montreal_gas_p.sample_id)
-        montreal_indirect_rows = findall(x->x==sample_id_subset[i], montreal_indirect.sample_id)
-
-        montreal_a[:,:,i]         = montreal_gas_p[montreal_gas_p_rows, [:a1,:a2,:a3,:a4]]|> Matrix
-        montreal_τ[:,:,i]         = montreal_gas_p[montreal_gas_p_rows, [:tau1,:tau2,:tau3,:tau4]]|> Matrix
-        montreal_f[:,:,i]         = montreal_gas_p[montreal_gas_p_rows, [:f1,:f2,:f3]]|> Matrix
-        montreal_ind_f[:,:,i]     = montreal_indirect[montreal_indirect_rows, [:f1,:f2,:f3]]|> Matrix
-        montreal_r0[:,i]          = montreal_gas_p[montreal_gas_p_rows, :r0]
-        montreal_rC[:,i]          = montreal_gas_p[montreal_gas_p_rows, :rC]
-        montreal_rT[:,i]          = montreal_gas_p[montreal_gas_p_rows, :rT]
-        montreal_rA[:,i]          = montreal_gas_p[montreal_gas_p_rows, :rA]
-        montreal_pi_conc[:,i]     = montreal_gas_p[montreal_gas_p_rows, :PI_conc]
+        montreal_a[:,:,i]         = montreal_gas_p[indices.montreal_gas_p_rows[i], [:a1,:a2,:a3,:a4]]|> Matrix
+        montreal_τ[:,:,i]         = montreal_gas_p[indices.montreal_gas_p_rows[i], [:tau1,:tau2,:tau3,:tau4]]|> Matrix
+        montreal_f[:,:,i]         = montreal_gas_p[indices.montreal_gas_p_rows[i], [:f1,:f2,:f3]]|> Matrix
+        montreal_ind_f[:,:,i]     = montreal_indirect[montreal_indirect_rows[i], [:f1,:f2,:f3]]|> Matrix
+        montreal_r0[:,i]          = montreal_gas_p[indices.montreal_gas_p_rows[i], :r0]
+        montreal_rC[:,i]          = montreal_gas_p[indices.montreal_gas_p_rows[i], :rC]
+        montreal_rT[:,i]          = montreal_gas_p[indices.montreal_gas_p_rows[i], :rT]
+        montreal_rA[:,i]          = montreal_gas_p[indices.montreal_gas_p_rows[i], :rA]
+        montreal_pi_conc[:,i]     = montreal_gas_p[indices.montreal_gas_p_rows[i], :PI_conc]
         
         # Flourinated gases.
-        flourinated_gas_p_rows = findall(x->x==sample_id_subset[i], flourinated_gas_p.sample_id)
-
-        flourinated_a[:,:,i]      = flourinated_gas_p[flourinated_gas_p_rows, [:a1,:a2,:a3,:a4]]|> Matrix
-        flourinated_τ[:,:,i]      = flourinated_gas_p[flourinated_gas_p_rows, [:tau1,:tau2,:tau3,:tau4]]|> Matrix
-        flourinated_f[:,:,i]      = flourinated_gas_p[flourinated_gas_p_rows, [:f1,:f2,:f3]]|> Matrix
-        flourinated_r0[:,i]       = flourinated_gas_p[flourinated_gas_p_rows, :r0]
-        flourinated_rC[:,i]       = flourinated_gas_p[flourinated_gas_p_rows, :rC]
-        flourinated_rT[:,i]       = flourinated_gas_p[flourinated_gas_p_rows, :rT]
-        flourinated_rA[:,i]       = flourinated_gas_p[flourinated_gas_p_rows, :rA]
-        flourinated_pi_conc[:,i]  = flourinated_gas_p[flourinated_gas_p_rows, :PI_conc]
+        flourinated_a[:,:,i]      = flourinated_gas_p[indices.flourinated_gas_p_rows[i], [:a1,:a2,:a3,:a4]]|> Matrix
+        flourinated_τ[:,:,i]      = flourinated_gas_p[indices.flourinated_gas_p_rows[i], [:tau1,:tau2,:tau3,:tau4]]|> Matrix
+        flourinated_f[:,:,i]      = flourinated_gas_p[indices.flourinated_gas_p_rows[i], [:f1,:f2,:f3]]|> Matrix
+        flourinated_r0[:,i]       = flourinated_gas_p[indices.flourinated_gas_p_rows[i], :r0]
+        flourinated_rC[:,i]       = flourinated_gas_p[indices.flourinated_gas_p_rows[i], :rC]
+        flourinated_rT[:,i]       = flourinated_gas_p[indices.flourinated_gas_p_rows[i], :rT]
+        flourinated_rA[:,i]       = flourinated_gas_p[indices.flourinated_gas_p_rows[i], :rA]
+        flourinated_pi_conc[:,i]  = flourinated_gas_p[indices.flourinated_gas_p_rows[i], :PI_conc]
 
         # Aerosol+ gases.
-        aerosol_plus_gas_p_rows = findall(x->x==sample_id_subset[i], aerosol_plus_gas_p.sample_id)
-
-        aerosol_plus_a[:,:,i]     = aerosol_plus_gas_p[aerosol_plus_gas_p_rows, [:a1,:a2,:a3,:a4]]|> Matrix
-        aerosol_plus_τ[:,:,i]     = aerosol_plus_gas_p[aerosol_plus_gas_p_rows, [:tau1,:tau2,:tau3,:tau4]]|> Matrix
-        aerosol_plus_r0[:,i]      = aerosol_plus_gas_p[aerosol_plus_gas_p_rows, :r0]
-        aerosol_plus_rC[:,i]      = aerosol_plus_gas_p[aerosol_plus_gas_p_rows, :rC]
-        aerosol_plus_rT[:,i]      = aerosol_plus_gas_p[aerosol_plus_gas_p_rows, :rT]
-        aerosol_plus_rA[:,i]      = aerosol_plus_gas_p[aerosol_plus_gas_p_rows, :rA]
-        aerosol_plus_pi_conc[:,i] = aerosol_plus_gas_p[aerosol_plus_gas_p_rows, :PI_conc]
+        aerosol_plus_a[:,:,i]     = aerosol_plus_gas_p[indices.aerosol_plus_gas_p_rows[i], [:a1,:a2,:a3,:a4]]|> Matrix
+        aerosol_plus_τ[:,:,i]     = aerosol_plus_gas_p[indices.aerosol_plus_gas_p_rows[i], [:tau1,:tau2,:tau3,:tau4]]|> Matrix
+        aerosol_plus_r0[:,i]      = aerosol_plus_gas_p[indices.aerosol_plus_gas_p_rows[i], :r0]
+        aerosol_plus_rC[:,i]      = aerosol_plus_gas_p[indices.aerosol_plus_gas_p_rows[i], :rC]
+        aerosol_plus_rT[:,i]      = aerosol_plus_gas_p[indices.aerosol_plus_gas_p_rows[i], :rT]
+        aerosol_plus_rA[:,i]      = aerosol_plus_gas_p[indices.aerosol_plus_gas_p_rows[i], :rA]
+        aerosol_plus_pi_conc[:,i] = aerosol_plus_gas_p[indices.aerosol_plus_gas_p_rows[i], :PI_conc]
 
         # Aerosol+ forcing parameters.
-        aerosol_plus_gas_p_bitvector = aerosol_plus_gas_p.sample_id .== sample_id_subset[i]
-        indirect_forcing_bitvector = indirect_forcing_params.sample_id .== sample_id_subset[i]
-
-        bc_f[i,:]                 = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "bc") .& aerosol_plus_gas_p_bitvector, [:f1,:f2,:f3]])
-        bc_snow_f[i,:]            = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "bc|bc_on_snow") .& indirect_forcing_bitvector, [:f1,:f2,:f3]])
-        bc_aci_f[i,:]             = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "bc|aci") .& indirect_forcing_bitvector, [:f1,:f2,:f3]])
-        co_f[i,:]                 = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "co") .& aerosol_plus_gas_p_bitvector, [:f1,:f2,:f3]])
-        co_o3_f[i,:]              = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "co|o3") .& indirect_forcing_bitvector, [:f1,:f2,:f3]])
-        nh3_f[i,:]                = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "nh3") .& aerosol_plus_gas_p_bitvector, [:f1,:f2,:f3]])
-        nmvoc_f[i,:]              = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "nmvoc") .& aerosol_plus_gas_p_bitvector, [:f1,:f2,:f3]])
-        nmvoc_o3_f[i,:]           = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "nmvoc|o3") .& indirect_forcing_bitvector, [:f1,:f2,:f3]])
-        nox_f[i,:]                = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "nox") .& aerosol_plus_gas_p_bitvector, [:f1,:f2,:f3]])
-        nox_o3_f[i,:]             = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "nox|o3") .& indirect_forcing_bitvector, [:f1,:f2,:f3]])
-        nox_avi_f[i,:]            = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "nox_avi") .& aerosol_plus_gas_p_bitvector, [:f1,:f2,:f3]])
-        nox_avi_contrails_f[i,:]  = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "nox_avi|contrails") .& indirect_forcing_bitvector, [:f1,:f2,:f3]])
-        oc_f[i,:]                 = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "oc") .& aerosol_plus_gas_p_bitvector, [:f1,:f2,:f3]])
-        oc_aci_f[i,:]             = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "oc|aci") .& indirect_forcing_bitvector, [:f1,:f2,:f3]])
-        so2_f[i,:]                = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "so2") .& aerosol_plus_gas_p_bitvector, [:f1,:f2,:f3]])
-        so2_aci_f[i,:]            = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "so2|aci") .& indirect_forcing_bitvector, [:f1,:f2,:f3]])
-    end
-
-    # Iniitlaize arrays for g1 and g0 parameters.
-    montreal_g0     = zeros(n_montreal, n_samples)
-    montreal_g1     = zeros(n_montreal, n_samples)
-    flourinated_g0  = zeros(n_flourinated, n_samples)
-    flourinated_g1  = zeros(n_flourinated, n_samples)
-    aerosol_plus_g0 = zeros(n_aerosol_plus, n_samples)
-    aerosol_plus_g1 = zeros(n_aerosol_plus, n_samples)
-
-    # Calculate g1 and g0 parameters for non-primary gas groups.
-    for i = 1:n_samples
-        montreal_g0[:,i],     montreal_g1[:,i]     = MimiFAIRv2.calculate_g0_g1(montreal_a[:,:,i], montreal_τ[:,:,i])
-        flourinated_g0[:,i],  flourinated_g1[:,i]  = MimiFAIRv2.calculate_g0_g1(flourinated_a[:,:,i], flourinated_τ[:,:,i])
-        aerosol_plus_g0[:,i], aerosol_plus_g1[:,i] = MimiFAIRv2.calculate_g0_g1(aerosol_plus_a[:,:,i], aerosol_plus_τ[:,:,i])
+        bc_f[i,:]                 = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "bc") .& indices.aerosol_plus_gas_p_rows[i], [:f1,:f2,:f3]])
+        bc_snow_f[i,:]            = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "bc|bc_on_snow") .& indices.indirect_forcing_rows[i], [:f1,:f2,:f3]])
+        bc_aci_f[i,:]             = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "bc|aci") .& indices.indirect_forcing_rows[i], [:f1,:f2,:f3]])
+        co_f[i,:]                 = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "co") .& indices.aerosol_plus_gas_p_rows[i], [:f1,:f2,:f3]])
+        co_o3_f[i,:]              = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "co|o3") .& indices.indirect_forcing_rows[i], [:f1,:f2,:f3]])
+        nh3_f[i,:]                = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "nh3") .& indices.aerosol_plus_gas_p_rows[i], [:f1,:f2,:f3]])
+        nmvoc_f[i,:]              = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "nmvoc") .& indices.aerosol_plus_gas_p_rows[i], [:f1,:f2,:f3]])
+        nmvoc_o3_f[i,:]           = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "nmvoc|o3") .& indices.indirect_forcing_rows[i], [:f1,:f2,:f3]])
+        nox_f[i,:]                = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "nox") .& indices.aerosol_plus_gas_p_rows[i], [:f1,:f2,:f3]])
+        nox_o3_f[i,:]             = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "nox|o3") .& indices.indirect_forcing_rows[i], [:f1,:f2,:f3]])
+        nox_avi_f[i,:]            = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "nox_avi") .& indices.aerosol_plus_gas_p_rows[i], [:f1,:f2,:f3]])
+        nox_avi_contrails_f[i,:]  = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "nox_avi|contrails") .& indices.indirect_forcing_rows[i], [:f1,:f2,:f3]])
+        oc_f[i,:]                 = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "oc") .& indices.aerosol_plus_gas_p_rows[i], [:f1,:f2,:f3]])
+        oc_aci_f[i,:]             = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "oc|aci") .& indices.indirect_forcing_rows[i], [:f1,:f2,:f3]])
+        so2_f[i,:]                = Array(aerosol_plus_gas_p[(aerosol_plus_gas_p.gas_name .== "so2") .& indices.aerosol_plus_gas_p_rows[i], [:f1,:f2,:f3]])
+        so2_aci_f[i,:]            = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "so2|aci") .& indices.indirect_forcing_rows[i], [:f1,:f2,:f3]])
     end
 
     #Calculate thermal decay factors, defined as exp(-1/d).
