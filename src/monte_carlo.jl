@@ -191,7 +191,7 @@ function create_fair_monte_carlo(n_samples::Int;
         montreal_a[:,:,i]         = montreal_gas_p[indices.montreal_gas_p_rows[i], [:a1,:a2,:a3,:a4]]|> Matrix
         montreal_τ[:,:,i]         = montreal_gas_p[indices.montreal_gas_p_rows[i], [:tau1,:tau2,:tau3,:tau4]]|> Matrix
         montreal_f[:,:,i]         = montreal_gas_p[indices.montreal_gas_p_rows[i], [:f1,:f2,:f3]]|> Matrix
-        montreal_ind_f[:,:,i]     = montreal_indirect[montreal_indirect_rows[i], [:f1,:f2,:f3]]|> Matrix
+        montreal_ind_f[:,:,i]     = montreal_indirect[indices.montreal_indirect_rows[i], [:f1,:f2,:f3]]|> Matrix
         montreal_r0[:,i]          = montreal_gas_p[indices.montreal_gas_p_rows[i], :r0]
         montreal_rC[:,i]          = montreal_gas_p[indices.montreal_gas_p_rows[i], :rC]
         montreal_rT[:,i]          = montreal_gas_p[indices.montreal_gas_p_rows[i], :rT]
