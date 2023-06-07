@@ -2,3 +2,4 @@
 .vscode
 output/
 data/large_constrained_parameter_files
+test.jl
