@@ -236,6 +236,21 @@ function create_fair_monte_carlo(n_samples::Int;
         so2_aci_f[i,:]            = Array(indirect_forcing_params[(indirect_forcing_params.indirect_forcing_effect .== "so2|aci") .& indices.indirect_forcing_rows[i], [:f1,:f2,:f3]])
     end
 
+    # Iniitlaize arrays for g1 and g0 parameters.
+    montreal_g0     = zeros(n_montreal, n_samples)
+    montreal_g1     = zeros(n_montreal, n_samples)
+    flourinated_g0  = zeros(n_flourinated, n_samples)
+    flourinated_g1  = zeros(n_flourinated, n_samples)
+    aerosol_plus_g0 = zeros(n_aerosol_plus, n_samples)
+    aerosol_plus_g1 = zeros(n_aerosol_plus, n_samples)
+
+    # Calculate g1 and g0 parameters for non-primary gas groups.
+    for i = 1:n_samples
+        montreal_g0[:,i],     montreal_g1[:,i]     = MimiFAIRv2.calculate_g0_g1(montreal_a[:,:,i], montreal_τ[:,:,i])
+        flourinated_g0[:,i],  flourinated_g1[:,i]  = MimiFAIRv2.calculate_g0_g1(flourinated_a[:,:,i], flourinated_τ[:,:,i])
+        aerosol_plus_g0[:,i], aerosol_plus_g1[:,i] = MimiFAIRv2.calculate_g0_g1(aerosol_plus_a[:,:,i], aerosol_plus_τ[:,:,i])
+    end
+
     #Calculate thermal decay factors, defined as exp(-1/d).
     thermal_decay_factors = exp.(-1.0 ./ Array(thermal_params[:,[:d1,:d2,:d3]]))
 
