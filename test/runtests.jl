@@ -26,7 +26,7 @@ using MimiFAIRv2: get_model, create_fair_monte_carlo # load `get_model` function
     @test length(fair_temps) == length(1750:2100)
 
     # start year - should error if use a start year other than 1750
-    @test_throws ErrorException get_model(start_year = 1760)
+    @test_logs (:warn, "FAIRv2 model monte carlo simulation should not be set to start with a year differing from 1750 as initial conditions are not calibrated for a different start year!") get_model(start_year = 1760)
 
     # emissions scenario
     m1 = get_model(emissions_forcing_scenario = "ssp126")
@@ -109,7 +109,7 @@ end
         m = MimiFAIRv2.get_model(emissions_forcing_scenario = ssp, start_year=1750, end_year=2100)
 
         # Update exogenous forcing and emissions data.
-        update_param!(m, :radiative_forcing, :exogenous_RF, python_exog_RF)
+        update_param!(m, :radiative_forcing, :other_RF, python_exog_RF)
         update_param!(m, :co2_cycle, :E_co2, python_emiss.carbon_dioxide)
         update_param!(m, :ch4_cycle, :E_ch4, python_emiss.methane)
         update_param!(m, :n2o_cycle, :E_n2o, python_emiss.nitrous_oxide)
