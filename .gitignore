@@ -3,3 +3,4 @@
 output/
 data/large_constrained_parameter_files
 test.jl
+test/Mimi_FAIR_replication*

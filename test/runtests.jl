@@ -97,8 +97,8 @@ end
         sort!(aerosol_plus_init, :gas_name)
 
         # Load replication emissions and forcing from Python.
-        python_emiss   = DataFrame(load(joinpath(@__DIR__, "..", "data", "python_replication_data", ssp*"_emissions.csv")))
-        python_exog_RF = DataFrame(load(joinpath(@__DIR__, "..", "data", "python_replication_data", ssp*"_forcing.csv")))[:,:External]
+        python_emiss   = DataFrame(load(joinpath(@__DIR__, "..", "data", "python_replication", ssp*"_emissions.csv")))
+        python_exog_RF = DataFrame(load(joinpath(@__DIR__, "..", "data", "python_replication", ssp*"_forcing.csv")))[:,:External]
 
         # Extract emissions arrays for multi-gas groupings.
         montreal_emissions     = python_emiss[:, Symbol.(montreal_init.gas_name)]
@@ -123,11 +123,11 @@ end
         julia_results = DataFrame(co2 = m[:co2_cycle, :co2], rf = m[:radiative_forcing, :total_RF], temp = m[:temperature, :T])
 
         # compare temperatures
-        python_results = load(joinpath(@__DIR__, "..", "data", "python_replication_data", string(ssp, "_temperature.csv"))) |> DataFrame
+        python_results = load(joinpath(@__DIR__, "..", "data", "python_replication", string(ssp, "_temperature.csv"))) |> DataFrame
         @test maximum(abs, julia_results[!, :temp] .- python_results[!, :default]) ≈ 0. atol = 1e-3
        
         # compare radiative forcing
-        python_results = load(joinpath(@__DIR__, "..", "data", "python_replication_data", string(ssp, "_forcing.csv"))) |> DataFrame
+        python_results = load(joinpath(@__DIR__, "..", "data", "python_replication", string(ssp, "_forcing.csv"))) |> DataFrame
         select!(python_results, "Forcing component", "Total")
         @test maximum(abs, julia_results[!, :rf] .- python_results[!, :Total]) ≈ 0. atol = 1e-3
 
@@ -135,7 +135,7 @@ end
         conv = select!(DataFrame(load(joinpath(@__DIR__, "..", "data", "default_gas_cycle_parameters.csv"), skiplines_begin=6)), :gas_name, :emis2conc)
         filter(:gas_name  => ==("carbon_dioxide"), conv)
 
-        python_results = load(joinpath(@__DIR__, "..", "data", "python_replication_data", string(ssp, "_concentrations.csv"))) |> DataFrame
+        python_results = load(joinpath(@__DIR__, "..", "data", "python_replication", string(ssp, "_concentrations.csv"))) |> DataFrame
         select!(python_results, "Gas name", "carbon_dioxide")
         @test maximum(abs, julia_results[!, :co2] .- python_results[!, :carbon_dioxide]) ≈ 0. atol = 1e-3
 
@@ -159,15 +159,15 @@ end
         python_results = DataFrame(:year => collect(1750:2100))
 
         # add temperature
-        res = load(joinpath(@__DIR__, "..", "data", "python_replication_data", string(ssp, "_temperature.csv"))) |> DataFrame
+        res = load(joinpath(@__DIR__, "..", "data", "python_replication", string(ssp, "_temperature.csv"))) |> DataFrame
         insertcols!(python_results, 2, :temp => res[!, :default])
 
         # compare radiative forcing
-        res = load(joinpath(@__DIR__, "..", "data", "python_replication_data", string(ssp, "_forcing.csv"))) |> DataFrame
+        res = load(joinpath(@__DIR__, "..", "data", "python_replication", string(ssp, "_forcing.csv"))) |> DataFrame
         insertcols!(python_results, 2, :rf => res[!, :Total])
 
         # compare emissions
-        res = load(joinpath(@__DIR__, "..", "data", "python_replication_data", string(ssp, "_concentrations.csv"))) |> DataFrame
+        res = load(joinpath(@__DIR__, "..", "data", "python_replication", string(ssp, "_concentrations.csv"))) |> DataFrame
         insertcols!(python_results, 2, :co2 => res[!, :carbon_dioxide])
 
         for name in [:co2, :rf, :temp]
