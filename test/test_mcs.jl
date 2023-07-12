@@ -6,7 +6,7 @@ using Test
 using MimiFAIRv2
 using Mimi
 
-using MimiFAIRv2: get_model, create_fair_monte_carlo # load `get_model` function to avoid need for `MimiFAIRv2.` prefix
+using MimiFAIRv2: get_model, create_fair_monte_carlo 
  
 n_samples = 5
 
@@ -34,6 +34,5 @@ results_deterministic_run2 = mcs_function_deterministic()
 
 # deletes the data because delete_downloaded_data should default to true
 MimiFAIRv2.create_fair_monte_carlo(n_samples)
-
 
 end

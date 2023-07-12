@@ -73,7 +73,7 @@ df |> @vlplot(
         color = {:ssp, title = "SSP", legend = {symbolOpacity = 1.}},
         width = 700,
         height = 500,
-        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "solid line Julia-Mimi; points original Python"]
+        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "points Julia-Mimi; solid line original Python"]
     ) +
     @vlplot(
         data = df |> @filter(_.implementation == "FAIRv2.0 (original Python version)"),
@@ -91,7 +91,7 @@ df |>
         color = {:ssp, title = "SSP", legend = {symbolOpacity = 1.}},
         width = 700,
         height = 500,
-        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "solid line Julia-Mimi; points original Python"]
+        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "points Julia-Mimi; solid line original Python"]
     ) +
     @vlplot(
         data = df |> @filter(_.implementation == "FAIRv2.0 (original Python version)" && parse(Int64, _.time) >= 2000),
@@ -110,7 +110,7 @@ df |> @vlplot(
         color = {:ssp, title = "SSP", legend = {symbolOpacity = 1.}},
         width = 700,
         height = 500,
-        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "solid line Julia-Mimi; points original Python"]
+        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "points Julia-Mimi; solid line original Python"]
     ) +
     @vlplot(
         data = df |> @filter(_.implementation == "FAIRv2.0 (original Python version)"),
@@ -127,7 +127,7 @@ df |> @vlplot(
         color = {:ssp, title = "SSP", legend = {symbolOpacity = 1.}},
         width = 700,
         height = 500,
-        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "solid line Julia-Mimi; points original Python"]
+        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "points Julia-Mimi; solid line original Python"]
     ) +
     @vlplot(
         data = df |> @filter(_.implementation == "FAIRv2.0 (original Python version)" && parse(Int64, _.time) >= 2000),
@@ -146,7 +146,7 @@ df |> @vlplot(
         color = {:ssp, title = "SSP", legend = {symbolOpacity = 1.}},
         width = 700,
         height = 500,
-        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "solid line Julia-Mimi; points original Python"]
+        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "points Julia-Mimi; solid line original Python"]
     ) +
     @vlplot(
         data = df |> @filter(_.implementation == "FAIRv2.0 (original Python version)"),
@@ -163,7 +163,7 @@ df |> @vlplot(
         color = {:ssp, title = "SSP", legend = {symbolOpacity = 1.}},
         width = 700,
         height = 500,
-        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "solid line Julia-Mimi; points original Python"]
+        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "points Julia-Mimi; solid line original Python"]
     ) +
     @vlplot(
         data = df |> @filter(_.implementation == "FAIRv2.0 (original Python version)" && parse(Int64, _.time) >= 2000),
@@ -182,7 +182,7 @@ df |> @vlplot(
         color = {:ssp, title = "SSP", legend = {symbolOpacity = 1.}},
         width = 700,
         height = 500,
-        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "solid line Julia-Mimi; points original Python"]
+        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "points Julia-Mimi; solid line original Python"]
     ) +
     @vlplot(
         data = df |> @filter(_.implementation == "FAIRv2.0 (original Python version)"),
@@ -200,7 +200,7 @@ df |> @vlplot(
         color = {:ssp, title = "SSP", legend = {symbolOpacity = 1.}},
         width = 700,
         height = 500,
-        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "solid line Julia-Mimi; points original Python"]
+        title = ["Python vs. Julia-Mimi versions of FaIR v2.0";"RCMIP Emission & Forcing Scenarios (1750-2100)"; "points Julia-Mimi; solid line original Python"]
     ) +
     @vlplot(
         data = df |> @filter(_.implementation == "FAIRv2.0 (original Python version)" && parse(Int64, _.time) >= 2000),
