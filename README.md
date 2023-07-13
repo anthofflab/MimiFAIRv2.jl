@@ -108,3 +108,21 @@ Function Arguments:
 - co2_em_vals: A vector with n_samples elements, each of which is a vector spanning the full time of the model being run and holding an exogenous stream of co2 emissions in the native FAIRv2 units, GtC (convert to GtCO2 with multiplier 44/12)
 - n2o_em_vals: A vector with n_samples elements, each of which is a vector spanning the full time of the model being run and holding an exogenous stream of n2o emissions in the native FAIRv2 units, MtN (convert to MtN2O with multiplier 44/28)
 - ch4_em_vals: A vector with n_samples elements, each of which is a vector spanning the full time of the model being run and holding an exogenous stream of ch4 emissions in the native FAIRv2 units, MtCH4.
+
+## An important note on emissions sources
+
+**Also see `data/scripts/mimifairv2_python_data_explainer.ipynb`**
+
+In this repository we include two sets of rcmip emissions data. The first set are entitled 
+
+- data/python_replication/raw_data_from_python/rcmip_sspxx_emissions_1750_to_2500.csv (raw files from Python scripts)
+- data/rcmip_sspxx_emissions_1750_to_2500.csv (inputs to MimiFAIRv2)
+
+which use FAIRv2.0 code to directly pull RCMIP outputs.
+
+The second set rebase emission-driven forcings & species with natural emissions to 1750, including ["so2","nox","co","nmvoc","bc","nh3","oc","nox_avi","methyl_bromide","methyl_chloride","chcl3","ch2cl2"], as indicated in *notebooks/RCMIP/RCMIP-experiments.ipynb* from the FAIRv2.0.0-alpha from the replication code here: paper replication code here: https://github.com/njleach/leach-et-al-2021/tree/a4f8c73f3b45c8e82e70c5906f73e6ebad327954 and are labeled
+
+- data/python_replication/raw_data_from_python/rcmip_sspxx_emissions_1750_to_2500_rebased.csv (raw files from Python scripts)
+- data/rcmip_sspxx_emissions_1750_to_2500_rebased.csv (inputs to MimiFAIRv2)
+
+**To perfectly replicate the FAIRv2.0 paper code, rebased versions should be used.  Thus the default of this repository will be to use the rebased files.**
