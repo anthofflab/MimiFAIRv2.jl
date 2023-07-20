@@ -14,22 +14,22 @@ outdir = joinpath(@__DIR__, "regression_testing")
 ## INITIAL CREATION OF BASELINE DATA TO COMPARE AGAINST (run with a new version name if expect changes)
 ##
 
-# version = "saved_07122023"
+version = "saved_07122023_rebased"
 
-# # build up dataframe of results
-# df = DataFrame()
-# for ssp in ["ssp119", "ssp126", "ssp245", "ssp370", "ssp585"]
-#     m = MimiFAIRv2.get_model(emissions_forcing_scenario=ssp, start_year=1750, end_year=2100)
-#     run(m)
-#     append!(df, DataFrame(co2 = m[:co2_cycle, :co2], rf = m[:radiative_forcing, :total_RF], temp = m[:temperature, :T], ssp = ssp))
-# end
-# df |> save(joinpath(outdir, "output_data_$version.csv"))
+# build up dataframe of results
+df = DataFrame()
+for ssp in ["ssp119", "ssp126", "ssp245", "ssp370", "ssp585"]
+    m = MimiFAIRv2.get_model(emissions_forcing_scenario=ssp, start_year=1750, end_year=2100)
+    run(m)
+    append!(df, DataFrame(co2 = m[:co2_cycle, :co2], rf = m[:radiative_forcing, :total_RF], temp = m[:temperature, :T], ssp = ssp))
+end
+df |> save(joinpath(outdir, "output_data_$version.csv"))
 
 ##
 ## COMPARISON
 ##
 
-regression_baseline_version = "saved_07122023"
+regression_baseline_version = "saved_07122023_rebased"
 baseline_data = load(joinpath(outdir, "output_data_$(regression_baseline_version).csv")) |> DataFrame
 
 df = DataFrame()

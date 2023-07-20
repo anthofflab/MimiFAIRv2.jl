@@ -42,7 +42,7 @@ function get_model(;emissions_forcing_scenario::String="ssp585", start_year::Int
 	# Load emissions and forcing data and crop to appropriate model years (scenarios span 1750-2500 by default).
 	scenario_indices = indexin(start_year:end_year, 1750:2500)
 	forcing_data     = DataFrame(load(joinpath(@__DIR__, "..", "data", "rcmip_"*emissions_forcing_scenario*"_effective_radiative_forcing_1750_to_2500.csv"), skiplines_begin=6))[scenario_indices,:]
-	emissions_data   = DataFrame(load(joinpath(@__DIR__, "..", "data", "rcmip_"*emissions_forcing_scenario*"_emissions_1750_to_2500.csv"), skiplines_begin=6))[scenario_indices,:]
+	emissions_data   = DataFrame(load(joinpath(@__DIR__, "..", "data", "rcmip_"*emissions_forcing_scenario*"_emissions_1750_to_2500_rebased.csv"), skiplines_begin=6))[scenario_indices,:]
 
 	# Load FAIR default gas cycle (gas) and indirect radiative forcing (irf_p) parameters.
 	gas_p = DataFrame(load(joinpath(@__DIR__, "..", "data", "default_gas_cycle_parameters.csv"), skiplines_begin=6))
