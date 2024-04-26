@@ -6,7 +6,7 @@ using Test
 using MimiFAIRv2
 using Mimi
 
-using MimiFAIRv2: get_model, create_fair_monte_carlo 
+using MimiFAIRv2: get_model
 
 # run basic steps presented in README
 m = get_model()
